@@ -4,20 +4,20 @@
 	"parameters": {
 		"factoryName": {
 			"type": "string",
-			"metadata": "データ ファクトリ名",
+			"metadata": "Data Factory name",
 			"defaultValue": "va-yoshioka-poc"
 		},
 		"test01_link_blob_connectionString": {
 			"type": "secureString",
-			"metadata": "'test01_link_blob' の 'connectionString' のセキュリティで保護された文字列"
+			"metadata": "Secure string for 'connectionString' of 'test01_link_blob'"
 		},
 		"test01_link_files_connectionString": {
 			"type": "secureString",
-			"metadata": "'test01_link_files' の 'connectionString' のセキュリティで保護された文字列"
+			"metadata": "Secure string for 'connectionString' of 'test01_link_files'"
 		},
 		"test01_link_sql_connectionString": {
 			"type": "secureString",
-			"metadata": "'test01_link_sql' の 'connectionString' のセキュリティで保護された文字列"
+			"metadata": "Secure string for 'connectionString' of 'test01_link_sql'"
 		},
 		"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 			"type": "string",
@@ -3623,7 +3623,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/test01-private/blobs/11_B2D_simple/zz_yoshioka_import.csv2",
+					"blobPathBeginsWith": "/test01-private/blobs/11_B2D_simple/zz_yoshioka_import.csv",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]",
 					"events": [
