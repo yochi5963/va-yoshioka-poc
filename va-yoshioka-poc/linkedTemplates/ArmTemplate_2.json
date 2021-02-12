@@ -1901,7 +1901,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/test01-private/blobs/11_B2D_simple/zz_yoshioka_import.csv",
+					"blobPathBeginsWith": "/test01-private/blobs/11_B2D_simple/zz_yoshioka_import.csv2",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]",
 					"events": [
