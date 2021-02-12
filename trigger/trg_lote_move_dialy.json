@@ -1,0 +1,26 @@
+{
+	"name": "trg_lote_move_dialy",
+	"properties": {
+		"description": "日別フォルダへ移動",
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "lote_move_daily",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2021-01-20T17:26:00",
+				"endTime": "2021-02-01T06:25:00",
+				"timeZone": "Tokyo Standard Time"
+			}
+		}
+	}
+}

@@ -1,0 +1,34 @@
+{
+	"name": "11_out",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "11_B2D_simple"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FirstName",
+				"type": "varchar"
+			},
+			{
+				"name": "LastName",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "zz_yoshioka"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

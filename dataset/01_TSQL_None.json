@@ -1,0 +1,16 @@
+{
+	"name": "01_TSQL_None",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "01_TSQL"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

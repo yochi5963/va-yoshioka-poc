@@ -1,0 +1,22 @@
+{
+	"name": "dummy_pipline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Wait 3s",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 3
+				}
+			}
+		],
+		"folder": {
+			"name": "31_BlobLote"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-01-19T07:21:43Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

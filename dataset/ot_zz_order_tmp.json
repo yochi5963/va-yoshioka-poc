@@ -1,0 +1,47 @@
+{
+	"name": "ot_zz_order_tmp",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "22_BmD"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "order_id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "shop_cd",
+				"type": "varchar"
+			},
+			{
+				"name": "total",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "rgdt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "updt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "zz_order_tmp"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

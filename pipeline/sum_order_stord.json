@@ -1,0 +1,47 @@
+{
+	"name": "sum_order_stord",
+	"properties": {
+		"activities": [
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "00:00:30",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[zz_sum_order]",
+					"storedProcedureParameters": {
+						"in_shop_cd": {
+							"value": {
+								"value": "@{pipeline().parameters.shop_cd}",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "test01_link_sql",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"shop_cd": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "23_Calc"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-01-20T08:54:49Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,56 @@
+{
+	"name": "test01_blob_pipe",
+	"properties": {
+		"activities": [
+			{
+				"name": "MoveData",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"deleteFilesAfterCompletion": true
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "test01_blob_dataset_from",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "test01_blob_dataset_to",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"concurrency": 1,
+		"annotations": [],
+		"lastPublishTime": "2021-01-06T01:40:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

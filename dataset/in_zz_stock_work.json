@@ -1,0 +1,29 @@
+{
+	"name": "in_zz_stock_work",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "zz_stock_work.zip",
+				"folderPath": "21_B2D",
+				"container": "test01-private"
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "ZipDeflate",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

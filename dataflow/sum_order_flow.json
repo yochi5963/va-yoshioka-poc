@@ -1,0 +1,61 @@
+{
+	"name": "sum_order_flow",
+	"properties": {
+		"folder": {
+			"name": "23_Calc"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ot_zz_order",
+						"type": "DatasetReference"
+					},
+					"name": "Order"
+				},
+				{
+					"dataset": {
+						"referenceName": "ot_zz_odtail",
+						"type": "DatasetReference"
+					},
+					"name": "Odtail"
+				},
+				{
+					"dataset": {
+						"referenceName": "ot_zz_goods",
+						"type": "DatasetReference"
+					},
+					"name": "Goods"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ot_zz_order",
+						"type": "DatasetReference"
+					},
+					"name": "SinkOrder"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SumOdtail"
+				},
+				{
+					"name": "JoinGoods"
+				},
+				{
+					"name": "FilterOrder"
+				},
+				{
+					"name": "JoinSumOdtail"
+				},
+				{
+					"name": "AlterRowOrder"
+				}
+			],
+			"script": "parameters{\n\tshop_cd as string\n}\nsource(output(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Order\nsource(output(\n\t\todetail_id as long,\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tqty as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Odtail\nsource(output(\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tname as string,\n\t\tprice as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Goods\nJoinGoods aggregate(groupBy(order_id),\n\ttotal = sum(qty*price)) ~> SumOdtail\nOdtail, Goods join(Odtail@goods_cd == Goods@goods_cd,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinGoods\nOrder filter(shop_cd == $shop_cd) ~> FilterOrder\nFilterOrder, SumOdtail join(Order@order_id == SumOdtail@order_id,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinSumOdtail\nJoinSumOdtail alterRow(updateIf(true())) ~> AlterRowOrder\nAlterRowOrder sink(input(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['order_id'],\n\tformat: 'table',\n\tmapColumn(\n\t\torder_id = SumOdtail@order_id,\n\t\ttotal = SumOdtail@total\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> SinkOrder"
+		}
+	}
+}

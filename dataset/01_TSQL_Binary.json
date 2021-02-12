@@ -1,0 +1,23 @@
+{
+	"name": "01_TSQL_Binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "01_TSQL"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "01_TSQL_Binary.log",
+				"folderPath": "01_TSQL",
+				"container": "test01-private"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

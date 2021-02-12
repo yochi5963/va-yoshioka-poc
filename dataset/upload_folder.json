@@ -1,0 +1,22 @@
+{
+	"name": "upload_folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "31_BlobLote"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "31_BlobLote/upload",
+				"container": "test01-private"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

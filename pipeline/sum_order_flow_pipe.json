@@ -1,0 +1,48 @@
+{
+	"name": "sum_order_flow_pipe",
+	"properties": {
+		"activities": [
+			{
+				"name": "sum_order_flow",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "sum_order_flow",
+						"type": "DataFlowReference",
+						"parameters": {
+							"shop_cd": {
+								"value": "'@{pipeline().parameters.shop_cd}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "test01-runtime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"shop_cd": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "23_Calc"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-01-18T04:25:44Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

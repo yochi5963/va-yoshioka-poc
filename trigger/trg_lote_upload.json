@@ -1,0 +1,26 @@
+{
+	"name": "trg_lote_upload",
+	"properties": {
+		"description": "move daily",
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "lote_upload",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2021-01-19T14:55:00",
+				"endTime": "2021-02-05T04:54:00",
+				"timeZone": "Tokyo Standard Time"
+			}
+		}
+	}
+}

@@ -1,0 +1,69 @@
+{
+	"name": "ot_zz_stock_work",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_sql",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "shop_cd",
+				"type": "varchar"
+			},
+			{
+				"name": "jan_cd",
+				"type": "varchar"
+			},
+			{
+				"name": "book_qty",
+				"type": "decimal",
+				"precision": 12,
+				"scale": 4
+			},
+			{
+				"name": "stock_qty",
+				"type": "decimal",
+				"precision": 12,
+				"scale": 4
+			},
+			{
+				"name": "flg",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "planogram_flg",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "sales_flg",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "data_date",
+				"type": "nvarchar"
+			},
+			{
+				"name": "created_at",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "updated_at",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "zz_stock_work"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

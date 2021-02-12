@@ -1,0 +1,50 @@
+{
+	"name": "ot_zz_goods",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "21_B2D"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "shop_cd",
+				"type": "varchar"
+			},
+			{
+				"name": "goods_cd",
+				"type": "varchar"
+			},
+			{
+				"name": "name",
+				"type": "varchar"
+			},
+			{
+				"name": "price",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "rgdt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "updt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "zz_goods"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

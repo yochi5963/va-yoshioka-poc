@@ -1,0 +1,74 @@
+{
+	"name": "sum_order_sql",
+	"properties": {
+		"activities": [
+			{
+				"name": "calc_sum",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "UPDATE zz_order\t\nSET\t\n    zz_order.total = zz_order_sum.total,\t\n    zz_order.updt = CURRENT_TIMESTAMP \t\nFROM zz_order\t\nINNER JOIN (\t\n\tselect o1.order_id as order_id, sum (o2.qty * gs.price) as total\n\t from zz_order o1\n\t left join zz_odetail o2 on o2.order_id  = o1.order_id \n\t left join zz_goods gs on gs.goods_cd = o2.goods_cd \n\twhere o1.shop_cd = '@{pipeline().parameters.shop_cd}'\n\t group by o1.order_id\n) AS zz_order_sum\t\nON zz_order_sum.order_id = zz_order.order_id;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "01_TSQL_None",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "01_TSQL_Out",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"shop_cd": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "23_Calc"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-01-13T12:56:45Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

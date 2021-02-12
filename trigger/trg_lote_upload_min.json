@@ -1,0 +1,26 @@
+{
+	"name": "trg_lote_upload_min",
+	"properties": {
+		"description": "３分ごとに実行",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "lote_upload",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 3,
+				"startTime": "2021-01-19T05:17:00Z",
+				"endTime": "2021-01-19T05:59:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

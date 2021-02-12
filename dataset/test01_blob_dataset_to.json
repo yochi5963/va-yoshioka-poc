@@ -1,0 +1,20 @@
+{
+	"name": "test01_blob_dataset_to",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "ranking_copy2.txt",
+				"folderPath": "text",
+				"container": "test01-private"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
