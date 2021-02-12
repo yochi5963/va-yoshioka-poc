@@ -1,0 +1,130 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "データ ファクトリ名",
+			"defaultValue": "va-yoshioka-poc"
+		},
+		"test01_link_blob_connectionString": {
+			"type": "secureString",
+			"metadata": "'test01_link_blob' の 'connectionString' のセキュリティで保護された文字列"
+		},
+		"test01_link_files_connectionString": {
+			"type": "secureString",
+			"metadata": "'test01_link_files' の 'connectionString' のセキュリティで保護された文字列"
+		},
+		"test01_link_sql_connectionString": {
+			"type": "secureString",
+			"metadata": "'test01_link_sql' の 'connectionString' のセキュリティで保護された文字列"
+		},
+		"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "リンクされた ARM テンプレートを含むストレージ アカウントの URI"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "リンクされた ARM テンプレートを格納するストレージ アカウントへの SAS トークン"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "va-yoshioka-poc_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"test01_link_sql_connectionString": {
+						"value": "[parameters('test01_link_sql_connectionString')]"
+					},
+					"test01_link_blob_connectionString": {
+						"value": "[parameters('test01_link_blob_connectionString')]"
+					},
+					"test01_link_files_connectionString": {
+						"value": "[parameters('test01_link_files_connectionString')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "va-yoshioka-poc_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "va-yoshioka-poc_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
+						"value": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_1')]"
+			]
+		},
+		{
+			"name": "va-yoshioka-poc_ArmTemplate_3",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_3.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_2')]"
+			]
+		}
+	]
+}

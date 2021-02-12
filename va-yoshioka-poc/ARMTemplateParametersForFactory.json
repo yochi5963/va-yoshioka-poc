@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "va-yoshioka-poc"
+		},
+		"test01_link_blob_connectionString": {
+			"value": ""
+		},
+		"test01_link_files_connectionString": {
+			"value": ""
+		},
+		"test01_link_sql_connectionString": {
+			"value": ""
+		},
+		"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
+			"value": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
+		}
+	}
+}
