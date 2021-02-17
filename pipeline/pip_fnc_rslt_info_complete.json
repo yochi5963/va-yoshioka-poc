@@ -144,7 +144,15 @@
 									"partitionOption": "None"
 								},
 								"sink": {
-									"type": "AzureSqlSink"
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
 								},
 								"enableStaging": false,
 								"translator": {
@@ -164,7 +172,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "dst_sql_none",
+									"referenceName": "01_TSQL_Out",
 									"type": "DatasetReference"
 								}
 							]
