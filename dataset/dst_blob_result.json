@@ -1,0 +1,26 @@
+{
+	"name": "dst_blob_result",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "result.txt",
+				"folderPath": "work",
+				"container": "vstockpoc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
