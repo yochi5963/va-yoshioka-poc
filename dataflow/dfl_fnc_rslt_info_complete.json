@@ -1,0 +1,15 @@
+{
+	"name": "dfl_fnc_rslt_info_complete",
+	"properties": {
+		"folder": {
+			"name": "stock"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"script": ""
+		}
+	}
+}
