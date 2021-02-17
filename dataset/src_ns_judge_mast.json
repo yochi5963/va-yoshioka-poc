@@ -1,0 +1,27 @@
+{
+    "name": "src_ns_judge_mast",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "lnk_stock_blob",
+            "type": "LinkedServiceReference"
+        },
+        "folder": {
+            "name": "stock"
+        },
+        "annotations": [],
+        "type": "DelimitedText",
+        "typeProperties": {
+            "location": {
+                "type": "AzureBlobStorageLocation",
+                "fileName": "ns_judge_mast.zip",
+                "folderPath": "input",
+                "container": "vstockpoc"
+            },
+            "columnDelimiter": ",",
+            "compressionCodec": "ZipDeflate",
+            "escapeChar": "\\",
+            "quoteChar": "\""
+        },
+        "schema": []
+    }
+}
