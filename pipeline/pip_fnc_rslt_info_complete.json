@@ -1,9 +1,9 @@
 {
-	"name": "pip_fnc_rslt_info",
+	"name": "pip_fnc_rslt_info_complete",
 	"properties": {
 		"activities": [
 			{
-				"name": "ImportCsv",
+				"name": "CheckData",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -16,18 +16,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings",
-							"compressionProperties": {
-								"type": "ZipDeflateReadSettings"
-							}
-						}
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select count(*) from batch_exec_rslt_info\n where exec_dt = CONVERT(NCHAR, CURRENT_TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'Tokyo Standard Time', 112);\n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"sink": {
 						"type": "AzureSqlSink",
@@ -92,7 +84,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "src_company_mast",
+						"referenceName": "dst_sql_none",
 						"type": "DatasetReference"
 					}
 				],
@@ -102,6 +94,83 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "CheckData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@activity('CheckData').output = 0",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Wait1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "InsertData",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "insert into batch_exec_rslt_info\n(exec_dt, target_list_out_rslt_cd, target_list_out_rslt_tm)\nvalses\n(\nCONVERT(NCHAR, CURRENT_TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'Tokyo Standard Time', 112),\n'hoge',\n'foo'\n);",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "dst_sql_none",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "dst_sql_none",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
 			}
 		],
 		"concurrency": 1,
