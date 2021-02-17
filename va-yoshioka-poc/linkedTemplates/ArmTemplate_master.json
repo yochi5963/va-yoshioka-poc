@@ -4,20 +4,28 @@
 	"parameters": {
 		"factoryName": {
 			"type": "string",
-			"metadata": "Data Factory name",
+			"metadata": "データ ファクトリ名",
 			"defaultValue": "va-yoshioka-poc"
 		},
 		"test01_link_blob_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'test01_link_blob'"
+			"metadata": "'test01_link_blob' の 'connectionString' のセキュリティで保護された文字列"
 		},
 		"test01_link_files_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'test01_link_files'"
+			"metadata": "'test01_link_files' の 'connectionString' のセキュリティで保護された文字列"
 		},
 		"test01_link_sql_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'test01_link_sql'"
+			"metadata": "'test01_link_sql' の 'connectionString' のセキュリティで保護された文字列"
+		},
+		"lnk_stock_sql_connectionString": {
+			"type": "secureString",
+			"metadata": "'lnk_stock_sql' の 'connectionString' のセキュリティで保護された文字列"
+		},
+		"lnk_stock_blob_connectionString": {
+			"type": "secureString",
+			"metadata": "'lnk_stock_blob' の 'connectionString' のセキュリティで保護された文字列"
 		},
 		"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 			"type": "string",
@@ -25,11 +33,11 @@
 		},
 		"containerUri": {
 			"type": "string",
-			"metadata": "URI to storage account containing linked ARM templates"
+			"metadata": "リンクされた ARM テンプレートを含むストレージ アカウントの URI"
 		},
 		"containerSasToken": {
 			"type": "string",
-			"metadata": "Sas token to storage account containing linked ARM templates"
+			"metadata": "リンクされた ARM テンプレートを格納するストレージ アカウントへの SAS トークン"
 		}
 	},
 	"variables": {
@@ -58,6 +66,12 @@
 					},
 					"test01_link_files_connectionString": {
 						"value": "[parameters('test01_link_files_connectionString')]"
+					},
+					"lnk_stock_sql_connectionString": {
+						"value": "[parameters('lnk_stock_sql_connectionString')]"
+					},
+					"lnk_stock_blob_connectionString": {
+						"value": "[parameters('lnk_stock_blob_connectionString')]"
 					}
 				}
 			},
@@ -96,9 +110,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
-						"value": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]"
 					}
 				}
 			},
@@ -119,6 +130,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
+						"value": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]"
 					}
 				}
 			},
