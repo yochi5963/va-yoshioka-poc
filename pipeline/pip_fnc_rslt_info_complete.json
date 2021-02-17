@@ -22,59 +22,19 @@
 						"partitionOption": "None"
 					},
 					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": "truncate table company_mast;",
-						"disableMetricsCollection": false
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
 					},
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 1
-								},
-								"sink": {
-									"name": "bic_company_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 2
-								},
-								"sink": {
-									"name": "company_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 3
-								},
-								"sink": {
-									"name": "company_na",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 4
-								},
-								"sink": {
-									"name": "sort_jun",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							}
-						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -90,7 +50,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "snk_company_mast",
+						"referenceName": "01_TSQL_Out",
 						"type": "DatasetReference"
 					}
 				]
@@ -109,7 +69,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@activity('CheckData').output = 0",
+						"value": "@equals(activity('CheckData').output,0)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -183,9 +143,6 @@
 		],
 		"concurrency": 1,
 		"variables": {
-			"field_na": {
-				"type": "String"
-			},
 			"exec_na": {
 				"type": "String"
 			},
