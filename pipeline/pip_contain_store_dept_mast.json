@@ -1,0 +1,113 @@
+{
+    "name": "pip_contain_store_dept_mast",
+    "properties": {
+        "activities": [
+            {
+                "name": "ImportCsv",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "00:05:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobStorageReadSettings",
+                            "recursive": true,
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings",
+                            "compressionProperties": {
+                                "type": "ZipDeflateReadSettings"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureSqlSink",
+                        "preCopyScript": "truncate table contain_store_dept_mast;",
+                        "disableMetricsCollection": false
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "type": "String",
+                                    "ordinal": 1
+                                },
+                                "sink": {
+                                    "name": "bic_company_cd",
+                                    "type": "String",
+                                    "physicalType": "nvarchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "type": "String",
+                                    "ordinal": 2
+                                },
+                                "sink": {
+                                    "name": "company_cd",
+                                    "type": "String",
+                                    "physicalType": "nvarchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "type": "String",
+                                    "ordinal": 3
+                                },
+                                "sink": {
+                                    "name": "company_na",
+                                    "type": "String",
+                                    "physicalType": "nvarchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "type": "String",
+                                    "ordinal": 4
+                                },
+                                "sink": {
+                                    "name": "sort_jun",
+                                    "type": "String",
+                                    "physicalType": "nvarchar"
+                                }
+                            }
+                        ],
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "src_contain_store_dept_mast",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "snk_contain_store_dept_mast",
+                        "type": "DatasetReference"
+                    }
+                ]
+            }
+        ],
+        "concurrency": 1,
+        "folder": {
+            "name": "stock"
+        },
+        "annotations": []
+    }
+}
