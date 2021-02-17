@@ -1,36 +1,44 @@
 {
-    "name": "snk_contain_store_dept_mast",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "lnk_stock_sql",
-            "type": "LinkedServiceReference"
-        },
-        "folder": {
-            "name": "stock"
-        },
-        "annotations": [],
-        "type": "AzureSqlTable",
-        "schema": [
-            {
-                "name": "bic_company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_na",
-                "type": "nvarchar"
-            },
-            {
-                "name": "sort_jun",
-                "type": "nvarchar"
-            }
-        ],
-        "typeProperties": {
-            "schema": "dbo",
-            "table": "contain_store_dept_mast"
-        }
-    }
+	"name": "snk_contain_store_dept_mast",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "retail_store_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "dept_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "category_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sub_category_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "link_pattern",
+				"type": "nvarchar"
+			},
+			{
+				"name": "containing_store_cd",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "contain_store_dept_mast"
+		}
+	}
 }

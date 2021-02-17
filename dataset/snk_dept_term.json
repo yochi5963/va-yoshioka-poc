@@ -1,36 +1,33 @@
 {
-    "name": "snk_dept_term",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "lnk_stock_sql",
-            "type": "LinkedServiceReference"
-        },
-        "folder": {
-            "name": "stock"
-        },
-        "annotations": [],
-        "type": "AzureSqlTable",
-        "schema": [
-            {
-                "name": "bic_company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_na",
-                "type": "nvarchar"
-            },
-            {
-                "name": "sort_jun",
-                "type": "nvarchar"
-            }
-        ],
-        "typeProperties": {
-            "schema": "dbo",
-            "table": "dept_term"
-        }
-    }
+	"name": "snk_dept_term",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "company_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "dept_cd",
+				"type": "varchar"
+			},
+			{
+				"name": "judge_term",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "dept_term"
+		}
+	}
 }

@@ -1,36 +1,56 @@
 {
-    "name": "snk_exclude_goods_info",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "lnk_stock_sql",
-            "type": "LinkedServiceReference"
-        },
-        "folder": {
-            "name": "stock"
-        },
-        "annotations": [],
-        "type": "AzureSqlTable",
-        "schema": [
-            {
-                "name": "bic_company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_na",
-                "type": "nvarchar"
-            },
-            {
-                "name": "sort_jun",
-                "type": "nvarchar"
-            }
-        ],
-        "typeProperties": {
-            "schema": "dbo",
-            "table": "exclude_goods_info"
-        }
-    }
+	"name": "snk_exclude_goods_info",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "company_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "store_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "store_nm",
+				"type": "nvarchar"
+			},
+			{
+				"name": "jan_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "godds_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "remarks",
+				"type": "nvarchar"
+			},
+			{
+				"name": "dept_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "category_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sub_category_cd",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "exclude_goods_info"
+		}
+	}
 }

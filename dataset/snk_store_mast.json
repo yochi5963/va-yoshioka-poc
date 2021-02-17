@@ -1,36 +1,52 @@
 {
-    "name": "snk_store_mast",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "lnk_stock_sql",
-            "type": "LinkedServiceReference"
-        },
-        "folder": {
-            "name": "stock"
-        },
-        "annotations": [],
-        "type": "AzureSqlTable",
-        "schema": [
-            {
-                "name": "bic_company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_na",
-                "type": "nvarchar"
-            },
-            {
-                "name": "sort_jun",
-                "type": "nvarchar"
-            }
-        ],
-        "typeProperties": {
-            "schema": "dbo",
-            "table": "store_mast"
-        }
-    }
+	"name": "snk_store_mast",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "bic_company_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "company_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "store_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "store_na",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sort_jun",
+				"type": "nvarchar"
+			},
+			{
+				"name": "md_start_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "gm_start_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "gr_start_umu",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "store_mast"
+		}
+	}
 }

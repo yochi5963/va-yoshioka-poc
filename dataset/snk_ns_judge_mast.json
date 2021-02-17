@@ -1,36 +1,44 @@
 {
-    "name": "snk_ns_judge_mast",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "lnk_stock_sql",
-            "type": "LinkedServiceReference"
-        },
-        "folder": {
-            "name": "stock"
-        },
-        "annotations": [],
-        "type": "AzureSqlTable",
-        "schema": [
-            {
-                "name": "bic_company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_cd",
-                "type": "nvarchar"
-            },
-            {
-                "name": "company_na",
-                "type": "nvarchar"
-            },
-            {
-                "name": "sort_jun",
-                "type": "nvarchar"
-            }
-        ],
-        "typeProperties": {
-            "schema": "dbo",
-            "table": "ns_judge_mast"
-        }
-    }
+	"name": "snk_ns_judge_mast",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "odbms_stock_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "odbms_brakeset_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "intac_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "tlog_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "judge_kekka",
+				"type": "nvarchar"
+			},
+			{
+				"name": "judge_reason",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ns_judge_mast"
+		}
+	}
 }
