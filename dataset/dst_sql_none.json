@@ -1,5 +1,5 @@
 {
-	"name": "src_sql_none",
+	"name": "dst_sql_none",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "lnk_stock_sql",
