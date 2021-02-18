@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "threshold_info_0.csv",
+				"fileName": "threshold_info_1.csv",
 				"folderPath": "input",
 				"container": "vstockpoc"
 			},
