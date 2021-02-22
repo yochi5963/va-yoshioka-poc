@@ -1,26 +1,27 @@
 {
-    "name": "src_threshold_info",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "test01_link_blob",
-            "type": "LinkedServiceReference"
-        },
-        "folder": {
-            "name": "stock"
-        },
-        "annotations": [],
-        "type": "DelimitedText",
-        "typeProperties": {
-            "location": {
-                "type": "AzureBlobStorageLocation",
-                "fileName": "threshold_info_3.csv",
-                "folderPath": "input",
-                "container": "vstockpoc"
-            },
-            "columnDelimiter": ",",
-            "escapeChar": "\\",
-            "quoteChar": "\""
-        },
-        "schema": []
-    }
+	"name": "src_threshold_info",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "threshold_info.zip",
+				"folderPath": "input",
+				"container": "vstockpoc"
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "ZipDeflate",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
 }
