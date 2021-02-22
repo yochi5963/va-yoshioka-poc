@@ -6,6 +6,10 @@
 		"typeProperties": {
 			"serviceEndpoint": "https://vacommonblob.blob.core.windows.net",
 			"accountKind": "StorageV2"
+		},
+		"connectVia": {
+			"referenceName": "run-stock",
+			"type": "IntegrationRuntimeReference"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
