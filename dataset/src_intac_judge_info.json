@@ -2,7 +2,7 @@
     "name": "src_intac_judge_info",
     "properties": {
         "linkedServiceName": {
-            "referenceName": "lnk_stock_blob",
+            "referenceName": "test01_link_blob",
             "type": "LinkedServiceReference"
         },
         "folder": {

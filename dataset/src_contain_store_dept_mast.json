@@ -2,7 +2,7 @@
     "name": "src_contain_store_dept_mast",
     "properties": {
         "linkedServiceName": {
-            "referenceName": "lnk_stock_blob",
+            "referenceName": "test01_link_blob",
             "type": "LinkedServiceReference"
         },
         "folder": {
