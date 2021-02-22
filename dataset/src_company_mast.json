@@ -2,7 +2,7 @@
 	"name": "src_company_mast",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "lnk_stock_blob",
+			"referenceName": "test01_link_blob",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
@@ -14,8 +14,8 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": "company_mast.zip",
-				"folderPath": "input",
-				"container": "vstockpoc"
+				"folderPath": "stock/in",
+				"container": "test01-private"
 			},
 			"columnDelimiter": ",",
 			"compressionCodec": "ZipDeflate",
