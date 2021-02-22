@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "va-yoshioka-poc"
 		},
+		"lnk_stock_sql_connectionString": {
+			"value": ""
+		},
 		"test01_link_blob_connectionString": {
 			"value": ""
 		},
@@ -14,11 +17,8 @@
 		"test01_link_sql_connectionString": {
 			"value": ""
 		},
-		"lnk_stock_sql_connectionString": {
-			"value": ""
-		},
-		"lnk_stock_blob_connectionString": {
-			"value": ""
+		"lnk_stock_blob_properties_typeProperties_serviceEndpoint": {
+			"value": "https://vacommonblob.blob.core.windows.net"
 		},
 		"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 			"value": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"

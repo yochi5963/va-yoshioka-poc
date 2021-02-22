@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "'test01_link_sql' の 'connectionString' のセキュリティで保護された文字列"
 		},
+		"lnk_stock_sql_connectionString": {
+			"type": "secureString",
+			"metadata": "'lnk_stock_sql' の 'connectionString' のセキュリティで保護された文字列"
+		},
 		"test01_link_blob_connectionString": {
 			"type": "secureString",
 			"metadata": "'test01_link_blob' の 'connectionString' のセキュリティで保護された文字列"
@@ -19,13 +23,9 @@
 			"type": "secureString",
 			"metadata": "'test01_link_files' の 'connectionString' のセキュリティで保護された文字列"
 		},
-		"lnk_stock_sql_connectionString": {
-			"type": "secureString",
-			"metadata": "'lnk_stock_sql' の 'connectionString' のセキュリティで保護された文字列"
-		},
-		"lnk_stock_blob_connectionString": {
-			"type": "secureString",
-			"metadata": "'lnk_stock_blob' の 'connectionString' のセキュリティで保護された文字列"
+		"lnk_stock_blob_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://vacommonblob.blob.core.windows.net"
 		}
 	},
 	"variables": {
@@ -70,25 +70,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/test01-runtime')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "Japan East",
-						"dataFlowProperties": {
-							"computeType": "General",
-							"coreCount": 8,
-							"timeToLive": 0
-						}
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/run-stock')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -102,6 +83,25 @@
 							"coreCount": 8,
 							"timeToLive": 0,
 							"cleanup": true
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/test01-runtime')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "Japan East",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
 						}
 					}
 				}
@@ -553,6 +553,45 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/lnk_stock_blob')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('lnk_stock_blob_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "StorageV2"
+				},
+				"connectVia": {
+					"referenceName": "run-stock",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/run-stock')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lnk_stock_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('lnk_stock_sql_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "run-stock",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/run-stock')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/test01_link_blob')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -589,44 +628,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/test01-runtime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/lnk_stock_sql')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('lnk_stock_sql_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "run-stock",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/run-stock')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/lnk_stock_blob')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('lnk_stock_blob_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "run-stock",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/run-stock')]"
 			]
 		},
 		{

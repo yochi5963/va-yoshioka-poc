@@ -7,6 +7,10 @@
 			"metadata": "データ ファクトリ名",
 			"defaultValue": "va-yoshioka-poc"
 		},
+		"lnk_stock_sql_connectionString": {
+			"type": "secureString",
+			"metadata": "'lnk_stock_sql' の 'connectionString' のセキュリティで保護された文字列"
+		},
 		"test01_link_blob_connectionString": {
 			"type": "secureString",
 			"metadata": "'test01_link_blob' の 'connectionString' のセキュリティで保護された文字列"
@@ -19,13 +23,9 @@
 			"type": "secureString",
 			"metadata": "'test01_link_sql' の 'connectionString' のセキュリティで保護された文字列"
 		},
-		"lnk_stock_sql_connectionString": {
-			"type": "secureString",
-			"metadata": "'lnk_stock_sql' の 'connectionString' のセキュリティで保護された文字列"
-		},
-		"lnk_stock_blob_connectionString": {
-			"type": "secureString",
-			"metadata": "'lnk_stock_blob' の 'connectionString' のセキュリティで保護された文字列"
+		"lnk_stock_blob_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://vacommonblob.blob.core.windows.net"
 		},
 		"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 			"type": "string",
@@ -61,17 +61,17 @@
 					"test01_link_sql_connectionString": {
 						"value": "[parameters('test01_link_sql_connectionString')]"
 					},
+					"lnk_stock_sql_connectionString": {
+						"value": "[parameters('lnk_stock_sql_connectionString')]"
+					},
 					"test01_link_blob_connectionString": {
 						"value": "[parameters('test01_link_blob_connectionString')]"
 					},
 					"test01_link_files_connectionString": {
 						"value": "[parameters('test01_link_files_connectionString')]"
 					},
-					"lnk_stock_sql_connectionString": {
-						"value": "[parameters('lnk_stock_sql_connectionString')]"
-					},
-					"lnk_stock_blob_connectionString": {
-						"value": "[parameters('lnk_stock_blob_connectionString')]"
+					"lnk_stock_blob_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('lnk_stock_blob_properties_typeProperties_serviceEndpoint')]"
 					}
 				}
 			},
@@ -130,6 +130,26 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_2')]"
+			]
+		},
+		{
+			"name": "va-yoshioka-poc_ArmTemplate_4",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_4.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
 					},
 					"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 						"value": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]"
@@ -137,7 +157,7 @@
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_2')]"
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_3')]"
 			]
 		}
 	]
