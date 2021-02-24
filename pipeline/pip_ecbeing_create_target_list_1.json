@@ -89,7 +89,7 @@
 								{
 									"activity": "next_dummy",
 									"dependencyConditions": [
-										"Failed"
+										"Succeeded"
 									]
 								}
 							],
@@ -99,7 +99,13 @@
 									"referenceName": "pip_ecbeing_create_target_list_2",
 									"type": "PipelineReference"
 								},
-								"waitOnCompletion": true
+								"waitOnCompletion": true,
+								"parameters": {
+									"in_error_mode": {
+										"value": "@pipeline().parameters.in_error_mode",
+										"type": "Expression"
+									}
+								}
 							}
 						},
 						{
@@ -124,7 +130,7 @@
 									},
 									"vc_log_text": {
 										"value": {
-											"value": "@concat('次処理呼出 para=', pipeline().parameters.in_error_mode)",
+											"value": "@concat('次処理呼出1 para=', pipeline().parameters.in_error_mode)",
 											"type": "Expression"
 										},
 										"type": "String"

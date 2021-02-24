@@ -9,7 +9,7 @@
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.05:00:00",
+					"timeout": "00:01:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -19,7 +19,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND ecbeing_goods_in_rslt_cd  = '1'",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_stock_md_in_rslt_cd = '1'\n   AND odbms_stock_gr_in_rslt_cd = '1'\n   AND odbms_stock_gm_in_rslt_cd = '1'\n   AND odbms_arriv_md_in_rslt_cd = '1'\n   AND odbms_arriv_gr_in_rslt_cd = '1'\n   AND odbms_arriv_gm_in_rslt_cd = '1'\n   AND odbms_brakeset_in_rslt_cd = '1'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -49,7 +49,7 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "insert_normal_exec_log",
+							"name": "marge_error_exec_rslt_info_adf",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
@@ -61,14 +61,21 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+								"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
 								"storedProcedureParameters": {
+									"vc_error_mode": {
+										"value": {
+											"value": "@pipeline().parameters.in_error_mode",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
 									"vc_exec_na": {
 										"value": "ecbeing_goods_in_rslt",
 										"type": "String"
 									},
 									"vc_log_text": {
-										"value": "実施済であるため、ストアド処理を起動しません。",
+										"value": "他のバッチ処理がまだ完了していません。",
 										"type": "String"
 									}
 								}
@@ -81,7 +88,8 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "excec next pipe",
+							"name": "next_dummy",
+							"description": "処理終了",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
@@ -100,7 +108,10 @@
 										"type": "String"
 									},
 									"vc_log_text": {
-										"value": "実施済であるため、ストアド処理を起動しません。",
+										"value": {
+											"value": "@concat('次処理呼出2 para=', pipeline().parameters.in_error_mode)",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
@@ -114,6 +125,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"in_error_mode": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "stock"
 		},
