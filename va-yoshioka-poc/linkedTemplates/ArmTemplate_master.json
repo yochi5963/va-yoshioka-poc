@@ -31,6 +31,10 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
 		},
+		"trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode": {
+			"type": "string",
+			"defaultValue": "1"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "リンクされた ARM テンプレートを含むストレージ アカウントの URI"
@@ -153,6 +157,9 @@
 					},
 					"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 						"value": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]"
+					},
+					"trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode": {
+						"value": "[parameters('trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode')]"
 					}
 				}
 			},

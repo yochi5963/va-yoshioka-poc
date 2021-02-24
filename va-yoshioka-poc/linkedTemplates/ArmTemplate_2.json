@@ -193,7 +193,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -205,8 +205,8 @@
 					"location": {
 						"type": "AzureBlobStorageLocation",
 						"fileName": "company_mast.zip",
-						"folderPath": "input",
-						"container": "vstockpoc"
+						"folderPath": "stock/in",
+						"container": "test01-private"
 					},
 					"columnDelimiter": ",",
 					"compressionCodec": "ZipDeflate",
@@ -223,7 +223,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -253,7 +253,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -278,12 +278,42 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/src_ecbeing_create_target_list')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "ecbeing_goods.zip",
+						"folderPath": "appdata/ftpdata/ecbeing/in/goods",
+						"container": "vstockpoc"
+					},
+					"columnDelimiter": ",",
+					"compressionCodec": "ZipDeflate",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/src_exclude_goods_info')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -313,7 +343,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -343,7 +373,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -373,7 +403,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -403,7 +433,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_blob",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -414,11 +444,12 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "threshold_info_3.csv",
+						"fileName": "threshold_info.zip",
 						"folderPath": "input",
 						"container": "vstockpoc"
 					},
 					"columnDelimiter": ",",
+					"compressionCodec": "ZipDeflate",
 					"escapeChar": "\\",
 					"quoteChar": "\""
 				},
@@ -900,76 +931,6 @@
 						"type": "string"
 					}
 				},
-				"folder": {
-					"name": "01_TSQL"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-01-07T06:45:06Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/01_TSQL_SelectRecord')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "select",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select * from zz_yoshioka",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "01_TSQL_None",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "01_TSQL_Out",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
 				"folder": {
 					"name": "01_TSQL"
 				},

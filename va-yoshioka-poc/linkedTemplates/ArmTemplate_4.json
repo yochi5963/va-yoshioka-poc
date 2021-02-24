@@ -10,12 +10,318 @@
 		"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
+		},
+		"trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode": {
+			"type": "string",
+			"defaultValue": "1"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pip_intac_judge_info')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ImportCsv",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "00:05:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"compressionProperties": {
+										"type": "ZipDeflateReadSettings"
+									}
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "truncate table intac_judge_info;",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 1
+										},
+										"sink": {
+											"name": "dept_group_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
+										},
+										"sink": {
+											"name": "dept_group_na",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 3
+										},
+										"sink": {
+											"name": "dept_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 4
+										},
+										"sink": {
+											"name": "dept_na",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 5
+										},
+										"sink": {
+											"name": "category_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 6
+										},
+										"sink": {
+											"name": "sub_category_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 7
+										},
+										"sink": {
+											"name": "env_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 8
+										},
+										"sink": {
+											"name": "disp_logic",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "src_intac_judge_info",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "snk_intac_judge_info",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"concurrency": 1,
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pip_ns_judge_mast')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ImportCsv",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "00:05:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"compressionProperties": {
+										"type": "ZipDeflateReadSettings"
+									}
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "truncate table ns_judge_mast;",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 1
+										},
+										"sink": {
+											"name": "odbms_stock_umu",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
+										},
+										"sink": {
+											"name": "odbms_brakeset_umu",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 3
+										},
+										"sink": {
+											"name": "intac_umu",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 4
+										},
+										"sink": {
+											"name": "tlog_umu",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 5
+										},
+										"sink": {
+											"name": "judge_kekka",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 6
+										},
+										"sink": {
+											"name": "judge_reason",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "src_ns_judge_mast",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "snk_ns_judge_mast",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"concurrency": 1,
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pip_store_mast')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -615,6 +921,132 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pip_ecbeing_create_target_list_2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "バッチ実行結果を参照し自JOBが当日正常終了しているか確認",
+				"activities": [
+					{
+						"name": "GetJobStatus",
+						"description": "本日のバッチ実行結果を参照",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.05:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND ecbeing_goods_in_rslt_cd  = '1'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dst_sql_none",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "CheckJobStatus",
+						"description": "本日のバッチ実行結果をチェック",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetJobStatus",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(\n  equals(\n    activity('GetJobStatus').output.firstRow.cnt,\n    1\n  )\n)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "insert_normal_exec_log",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "00:01:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+										"storedProcedureParameters": {
+											"vc_exec_na": {
+												"value": "ecbeing_goods_in_rslt",
+												"type": "String"
+											},
+											"vc_log_text": {
+												"value": "実施済であるため、ストアド処理を起動しません。",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "lnk_stock_sql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "excec next pipe",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "00:01:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+										"storedProcedureParameters": {
+											"vc_exec_na": {
+												"value": "ecbeing_goods_in_rslt",
+												"type": "String"
+											},
+											"vc_log_text": {
+												"value": "実施済であるため、ストアド処理を起動しません。",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "lnk_stock_sql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/mpi_zz_order')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -848,6 +1280,208 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pip_ecbeing_create_target_list_1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "バッチ実行結果を参照し自JOBが当日正常終了しているか確認",
+				"activities": [
+					{
+						"name": "GetJobStatus",
+						"description": "本日のバッチ実行結果を参照",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.05:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND ecbeing_goods_in_rslt_cd  = '1'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dst_sql_none",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "CheckJobStatus",
+						"description": "本日のバッチ実行結果をチェック",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetJobStatus",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(\n  equals(\n    activity('GetJobStatus').output.firstRow.cnt,\n    1\n  )\n)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "cancel_pipeline",
+									"description": "処理終了",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "00:01:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+										"storedProcedureParameters": {
+											"vc_exec_na": {
+												"value": "ecbeing_goods_in_rslt",
+												"type": "String"
+											},
+											"vc_log_text": {
+												"value": "実施済であるため、ストアド処理を起動しません。",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "lnk_stock_sql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "next_pipeline",
+									"description": "後続処理呼出",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "next_dummy",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pip_ecbeing_create_target_list_2",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								},
+								{
+									"name": "next_dummy",
+									"description": "処理終了",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "00:01:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+										"storedProcedureParameters": {
+											"vc_exec_na": {
+												"value": "ecbeing_goods_in_rslt",
+												"type": "String"
+											},
+											"vc_log_text": {
+												"value": {
+													"value": "@concat('次処理呼出 para=', pipeline().parameters.in_error_mode)",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "lnk_stock_sql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"in_error_mode": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pip_ecbeing_create_target_list_2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trg_ecbeing_create_target_list_1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pip_ecbeing_create_target_list_1",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"in_error_mode": "[parameters('trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2021-02-25T06:00:00",
+						"endTime": "2021-02-26T06:00:00",
+						"timeZone": "Tokyo Standard Time",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								6,
+								7
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pip_ecbeing_create_target_list_1')]"
+			]
 		}
 	]
 }
