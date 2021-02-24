@@ -63,10 +63,17 @@
 				}
 			},
 			{
-				"name": "next_dummy_copy1",
+				"name": "next_dummy_copy",
 				"description": "処理終了",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "ExistsFile",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "00:01:00",
 					"retry": 0,
