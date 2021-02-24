@@ -1,0 +1,37 @@
+{
+	"name": "trg_ecbeing_create_target_list_1",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pip_ecbeing_create_target_list_1",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"in_error_mode": "1"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2021-02-25T06:00:00",
+				"endTime": "2021-02-26T06:00:00",
+				"timeZone": "Tokyo Standard Time",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						6,
+						7
+					]
+				}
+			}
+		}
+	}
+}

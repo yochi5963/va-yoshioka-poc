@@ -1,5 +1,5 @@
 {
-	"name": "pip_ecbeing_create_target_list_1",
+	"name": "pip_ecbeing_create_target_list_2",
 	"properties": {
 		"description": "バッチ実行結果を参照し自JOBが当日正常終了しているか確認",
 		"activities": [
@@ -49,8 +49,7 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "cancel_pipeline",
-							"description": "処理終了",
+							"name": "insert_normal_exec_log",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
@@ -82,29 +81,7 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "next_pipeline",
-							"description": "後続処理呼出",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "next_dummy",
-									"dependencyConditions": [
-										"Failed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "pip_ecbeing_create_target_list_2",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true
-							}
-						},
-						{
-							"name": "next_dummy",
-							"description": "処理終了",
+							"name": "excec next pipe",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
@@ -123,10 +100,7 @@
 										"type": "String"
 									},
 									"vc_log_text": {
-										"value": {
-											"value": "@concat('次処理呼出 para=', pipeline().parameters.in_error_mode)",
-											"type": "Expression"
-										},
+										"value": "実施済であるため、ストアド処理を起動しません。",
 										"type": "String"
 									}
 								}
@@ -140,11 +114,6 @@
 				}
 			}
 		],
-		"parameters": {
-			"in_error_mode": {
-				"type": "string"
-			}
-		},
 		"folder": {
 			"name": "stock"
 		},
