@@ -4,101 +4,6 @@
 		"description": "CSVファイルを新規の一時テーブルに読み込みストアド呼び出し",
 		"activities": [
 			{
-				"name": "CheckFile",
-				"description": "CSVファイルが存在するかをチェック",
-				"type": "IfCondition",
-				"dependsOn": [
-					{
-						"activity": "ExistsFile",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@equals(\n  activity('ExistsFile').output.exists,\n  true\n)\n",
-						"type": "Expression"
-					},
-					"ifFalseActivities": [
-						{
-							"name": "marge_error_exec_rslt_info_adf",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "00:01:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
-								"storedProcedureParameters": {
-									"vc_error_mode": {
-										"value": {
-											"value": "@pipeline().parameters.in_error_mode",
-											"type": "Expression"
-										},
-										"type": "String"
-									},
-									"vc_exec_na": {
-										"value": "ecbeing_goods_in_rslt",
-										"type": "String"
-									},
-									"vc_log_text": {
-										"value": "CSVファイルが存在しません。",
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "lnk_stock_sql",
-								"type": "LinkedServiceReference"
-							}
-						}
-					],
-					"ifTrueActivities": [
-						{
-							"name": "next_dummy",
-							"description": "処理終了",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "00:01:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
-								"storedProcedureParameters": {
-									"vc_exec_na": {
-										"value": "ecbeing_goods_in_rslt",
-										"type": "String"
-									},
-									"vc_log_text": {
-										"value": {
-											"value": "@concat('次処理呼出3 para=', pipeline().parameters.in_error_mode)",
-											"type": "Expression"
-										},
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "lnk_stock_sql",
-								"type": "LinkedServiceReference"
-							}
-						}
-					]
-				}
-			},
-			{
 				"name": "ExistsFile",
 				"description": "CSVファイルの到着待ち",
 				"type": "Validation",
@@ -111,6 +16,84 @@
 					},
 					"timeout": "00:00:15",
 					"sleep": 10
+				}
+			},
+			{
+				"name": "marge_error_exec_rslt_info_adf_copy1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ExistsFile",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
+					"storedProcedureParameters": {
+						"vc_error_mode": {
+							"value": {
+								"value": "@pipeline().parameters.in_error_mode",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in_rslt",
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": "CSVファイルが存在しません。",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "next_dummy_copy1",
+				"description": "処理終了",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in_rslt",
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": {
+								"value": "@concat('次処理呼出3 para=', pipeline().parameters.in_error_mode)",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
