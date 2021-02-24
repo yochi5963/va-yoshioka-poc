@@ -5,7 +5,14 @@
 			{
 				"name": "CheckJob",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "CheckFile",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.05:00:00",
 					"retry": 0,
@@ -17,7 +24,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT *\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt <> dbo.get_current_exec_dt();",
+						"sqlReaderQuery": "SELECT 147 as kekka\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt <> dbo.get_current_exec_dt();",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -28,44 +35,18 @@
 				}
 			},
 			{
-				"name": "Copy data1",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "CheckJob",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
+				"name": "CheckFile",
+				"type": "Validation",
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "11_in",
+					"dataset": {
+						"referenceName": "src_ecbeing_create_target_list",
 						"type": "DatasetReference"
-					}
-				]
+					},
+					"timeout": "0.00:00:20",
+					"sleep": 10
+				}
 			}
 		],
 		"parameters": {
