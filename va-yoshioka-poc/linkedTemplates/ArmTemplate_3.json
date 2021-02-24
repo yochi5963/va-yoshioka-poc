@@ -2053,50 +2053,17 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pip_ecbeing_create_target_list')]",
+			"name": "[concat(parameters('factoryName'), '/pip_ecbeing_create_target_list_3')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "CSVファイルを新規の一時テーブルに読み込みストアド呼び出し",
 				"activities": [
 					{
-						"name": "GetJobStatus",
-						"description": "本日のバッチ実行結果を参照",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.05:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT *\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt <> dbo.get_current_exec_dt();",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dst_sql_none",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "CheckFile",
-						"description": "ファイルの到着を監視",
+						"name": "ExistsFile",
+						"description": "CSVファイルの到着待ち",
 						"type": "Validation",
-						"dependsOn": [
-							{
-								"activity": "CheckJobStatus",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"userProperties": [],
 						"typeProperties": {
 							"dataset": {
@@ -2104,88 +2071,101 @@
 								"type": "DatasetReference",
 								"parameters": {}
 							},
-							"timeout": "0.00:00:30",
+							"timeout": "00:01:00",
 							"sleep": 10
 						}
 					},
 					{
-						"name": "CheckJobStatus",
-						"description": "本日のバッチ実行結果をチェック",
-						"type": "IfCondition",
+						"name": "marge_error_exec_rslt_info_adf",
+						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "GetJobStatus",
+								"activity": "ExistsFile",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "00:01:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[marge_error_exec_rslt_info_adf]",
+							"storedProcedureParameters": {
+								"vc_error_mode": {
+									"value": {
+										"value": "@pipeline().parameters.in_error_mode",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"vc_exec_na": {
+									"value": "ecbeing_goods_in_rslt",
+									"type": "String"
+								},
+								"vc_log_text": {
+									"value": "CSVファイルが存在しません。",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "lnk_stock_sql",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "next_dummy",
+						"description": "処理終了",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ExistsFile",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							}
 						],
+						"policy": {
+							"timeout": "00:01:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"expression": {
-								"value": "@equals(\n  activity('GetJobStatus').output.firstRow.target_list_out_rslt_cd,\n  '1'\n)",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
+							"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+							"storedProcedureParameters": {
+								"vc_exec_na": {
+									"value": "ecbeing_goods_in_rslt",
+									"type": "String"
+								},
+								"vc_log_text": {
+									"value": {
+										"value": "@concat('次処理呼出3 para=', pipeline().parameters.in_error_mode)",
+										"type": "Expression"
 									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": "select '正常終了っす'",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "dst_sql_none",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "dst_blob_result",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
+									"type": "String"
 								}
-							]
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "lnk_stock_sql",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
+				"parameters": {
+					"in_error_mode": {
+						"type": "string"
+					}
+				},
 				"folder": {
 					"name": "stock"
 				},
