@@ -44,7 +44,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@not(\n  equals(\n    activity('GetJobStatus').output.firstRow.cnt,\n    1\n  )\n)",
+						"value": "@equals(\n  activity('GetJobStatus').output.firstRow.cnt,\n  1\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
