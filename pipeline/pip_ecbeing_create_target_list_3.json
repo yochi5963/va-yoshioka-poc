@@ -4,38 +4,12 @@
 		"description": "CSVファイルを新規の一時テーブルに読み込みストアド呼び出し",
 		"activities": [
 			{
-				"name": "GetJobStatus",
-				"description": "本日のバッチ実行結果を参照",
-				"type": "Lookup",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "00:01:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_stock_md_in_rslt_cd = '1'\n   AND odbms_stock_gr_in_rslt_cd = '1'\n   AND odbms_stock_gm_in_rslt_cd = '1'\n   AND odbms_arriv_md_in_rslt_cd = '1'\n   AND odbms_arriv_gr_in_rslt_cd = '1'\n   AND odbms_arriv_gm_in_rslt_cd = '1'\n   AND odbms_brakeset_in_rslt_cd = '1'",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "dst_sql_none",
-						"type": "DatasetReference"
-					}
-				}
-			},
-			{
-				"name": "CheckJobStatus",
-				"description": "本日のバッチ実行結果をチェック",
+				"name": "CheckFile",
+				"description": "CSVファイルが存在するかをチェック",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "GetJobStatus",
+						"activity": "ExistsFile",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -44,7 +18,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(\n  activity('GetJobStatus').output.firstRow.cnt,\n  1\n)",
+						"value": "@equals(\n  activity('ExistsFile').output.exists,\n  true\n)\n",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -75,7 +49,7 @@
 										"type": "String"
 									},
 									"vc_log_text": {
-										"value": "他のバッチ処理がまだ完了していません。",
+										"value": "CSVファイルが存在しません。",
 										"type": "String"
 									}
 								}
@@ -109,7 +83,7 @@
 									},
 									"vc_log_text": {
 										"value": {
-											"value": "@concat('次処理呼出2 para=', pipeline().parameters.in_error_mode)",
+											"value": "@concat('次処理呼出3 para=', pipeline().parameters.in_error_mode)",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -122,6 +96,21 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "ExistsFile",
+				"description": "CSVファイルの到着待ち",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "src_ecbeing_create_target_list",
+						"type": "DatasetReference"
+					},
+					"timeout": "00:00:15",
+					"sleep": 10
 				}
 			}
 		],
