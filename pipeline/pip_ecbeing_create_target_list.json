@@ -1,0 +1,9 @@
+{
+	"name": "pip_ecbeing_create_target_list",
+	"properties": {
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": []
+	}
+}
