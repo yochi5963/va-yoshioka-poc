@@ -3,7 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "CheckJob",
+				"name": "GetJobStatus",
+				"description": "本日のバッチ実行結果を参照",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -24,7 +25,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT 147 as kekka\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt <> dbo.get_current_exec_dt();",
+						"sqlReaderQuery": "SELECT *\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt <> dbo.get_current_exec_dt();",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -36,6 +37,7 @@
 			},
 			{
 				"name": "CheckFile",
+				"description": "ファイルの到着を監視",
 				"type": "Validation",
 				"dependsOn": [],
 				"userProperties": [],
@@ -44,16 +46,86 @@
 						"referenceName": "src_ecbeing_create_target_list",
 						"type": "DatasetReference"
 					},
-					"timeout": "0.00:00:20",
+					"timeout": "0.00:00:30",
 					"sleep": 10
+				}
+			},
+			{
+				"name": "CheckJobStatus",
+				"description": "本日のバッチ実行結果をチェック",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetJobStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(\n  activity('GetJobStatus').output.firstRow.target_list_out_rslt_cd,\n  '1'\n)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "select '正常終了っす'",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "dst_sql_none",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "dst_blob_result",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
 				}
 			}
 		],
-		"parameters": {
-			"in_error_mode": {
-				"type": "string"
-			}
-		},
 		"folder": {
 			"name": "stock"
 		},
