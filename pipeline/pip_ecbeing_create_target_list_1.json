@@ -85,14 +85,7 @@
 							"name": "next_pipeline",
 							"description": "後続処理呼出",
 							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "next_dummy",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
@@ -106,40 +99,6 @@
 										"type": "Expression"
 									}
 								}
-							}
-						},
-						{
-							"name": "next_dummy",
-							"description": "処理終了",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "00:01:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
-								"storedProcedureParameters": {
-									"vc_exec_na": {
-										"value": "ecbeing_goods_in_rslt",
-										"type": "String"
-									},
-									"vc_log_text": {
-										"value": {
-											"value": "@concat('次処理呼出1 para=', pipeline().parameters.in_error_mode)",
-											"type": "Expression"
-										},
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "lnk_stock_sql",
-								"type": "LinkedServiceReference"
 							}
 						}
 					]

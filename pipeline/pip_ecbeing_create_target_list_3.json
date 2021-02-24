@@ -1,7 +1,7 @@
 {
-	"name": "pip_ecbeing_create_target_list_2",
+	"name": "pip_ecbeing_create_target_list_3",
 	"properties": {
-		"description": "バッチ実行結果を参照し先行JOBが当日正常終了していれば処理続行",
+		"description": "CSVファイルを新規の一時テーブルに読み込みストアド呼び出し",
 		"activities": [
 			{
 				"name": "GetJobStatus",
@@ -88,23 +88,37 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "next_pipeline",
-							"description": "後続処理呼出",
-							"type": "ExecutePipeline",
+							"name": "next_dummy",
+							"description": "処理終了",
+							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "pip_ecbeing_create_target_list_3",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"in_error_mode": {
-										"value": "@pipeline().parameters.in_error_mode",
-										"type": "Expression"
+								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+								"storedProcedureParameters": {
+									"vc_exec_na": {
+										"value": "ecbeing_goods_in_rslt",
+										"type": "String"
+									},
+									"vc_log_text": {
+										"value": {
+											"value": "@concat('次処理呼出2 para=', pipeline().parameters.in_error_mode)",
+											"type": "Expression"
+										},
+										"type": "String"
 									}
 								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
