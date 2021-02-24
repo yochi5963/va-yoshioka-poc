@@ -1,7 +1,7 @@
 {
 	"name": "pip_ecbeing_create_target_list_2",
 	"properties": {
-		"description": "バッチ実行結果を参照し自JOBが当日正常終了しているか確認",
+		"description": "バッチ実行結果を参照し先行JOBが当日正常終了していれば処理続行",
 		"activities": [
 			{
 				"name": "GetJobStatus",
