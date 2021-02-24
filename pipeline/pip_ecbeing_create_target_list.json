@@ -6,14 +6,7 @@
 				"name": "GetJobStatus",
 				"description": "本日のバッチ実行結果を参照",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "CheckFile",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.05:00:00",
 					"retry": 0,
@@ -39,7 +32,14 @@
 				"name": "CheckFile",
 				"description": "ファイルの到着を監視",
 				"type": "Validation",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "CheckJobStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
@@ -121,6 +121,45 @@
 									"type": "DatasetReference"
 								}
 							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Switch1",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@pipeline().RunId",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "@contains()",
+							"activities": [
+								{
+									"name": "Wait1",
+									"type": "Wait",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 1
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Wait2",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
 						}
 					]
 				}
