@@ -14,12 +14,12 @@
 						"referenceName": "src_ecbeing_create_target_list",
 						"type": "DatasetReference"
 					},
-					"timeout": "00:00:15",
+					"timeout": "00:01:00",
 					"sleep": 10
 				}
 			},
 			{
-				"name": "marge_error_exec_rslt_info_adf_copy1",
+				"name": "marge_error_exec_rslt_info_adf",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -63,7 +63,7 @@
 				}
 			},
 			{
-				"name": "next_dummy_copy",
+				"name": "next_dummy",
 				"description": "処理終了",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
