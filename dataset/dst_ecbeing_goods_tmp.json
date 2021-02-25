@@ -1,5 +1,5 @@
 {
-	"name": "dst_ecbeing_goods_tmp1",
+	"name": "dst_ecbeing_goods_tmp",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "lnk_stock_sql",
@@ -46,7 +46,7 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "ecbeing_goods_tmp1"
+			"table": "ecbeing_goods_tmp"
 		}
 	}
 }
