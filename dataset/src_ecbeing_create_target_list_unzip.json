@@ -1,0 +1,26 @@
+{
+	"name": "src_ecbeing_create_target_list_unzip",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "ecbeing_goods.csv",
+				"folderPath": "appdata/ftpdata/ecbeing/in/goods",
+				"container": "vstockpoc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
