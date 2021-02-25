@@ -259,7 +259,7 @@
 			},
 			{
 				"name": "MergeTmp2Info",
-				"description": "一時テーブルの重複行を削除して実テーブルへマージ",
+				"description": "一時テーブルを本テーブルにマージ（重複行を除く）",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -280,7 +280,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "MERGE ecbeing_goods_info AS inf\nUSING ecbeing_goods_tmp  AS tmp\n   ON tmp.shop_cd = inf.shop_cd\n  AND tmp.jan_cd  = inf.jan_cd\nWHEN MATCHED THEN\n    UPDATE SET company_cd         = tmp.company_cd,\n               dept_cd            = tmp.dept_cd,\n               category_cd        = tmp.category_cd,\n               sub_category_cd    = tmp.sub_category_cd,\n               sales_promotion_cd = tmp.sales_promotion_cd,\n               disp_status_cd     = tmp.disp_status_cd\n    WHEN NOT MATCHED THEN\n    INSERT (company_cd,\n            shop_cd,\n            dept_cd,\n            category_cd,\n            sub_category_cd,\n            jan_cd,\n            sales_promotion_cd,\n            disp_status_cd\n    )\n    VALUES (tmp.company_cd,\n            tmp.shop_cd,\n            tmp.dept_cd,\n            tmp.category_cd,\n            tmp.sub_category_cd,\n            tmp.jan_cd,\n            tmp.sales_promotion_cd,\n            tmp.disp_status_cd\n    );\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "MERGE ecbeing_goods_info AS inf\nUSING ecbeing_goods_tmp  AS tmp\n   ON tmp.shop_cd = inf.shop_cd\n  AND tmp.jan_cd  = inf.jan_cd\nWHEN NOT MATCHED THEN\n    INSERT (company_cd,\n            shop_cd,\n            dept_cd,\n            category_cd,\n            sub_category_cd,\n            jan_cd,\n            sales_promotion_cd,\n            disp_status_cd\n    )\n    VALUES (tmp.company_cd,\n            tmp.shop_cd,\n            tmp.dept_cd,\n            tmp.category_cd,\n            tmp.sub_category_cd,\n            tmp.jan_cd,\n            tmp.sales_promotion_cd,\n            tmp.disp_status_cd\n    );\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
