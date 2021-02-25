@@ -157,6 +157,39 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "marge_normal_exec_rslt_info",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": "exclude_goods_upload",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"concurrency": 1,
