@@ -1,0 +1,52 @@
+{
+	"name": "dst_ecbeing_goods_tmp2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "company_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "shop_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "dept_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "category_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sub_category_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "jan_cd",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sales_promotion_cd",
+				"type": "nchar"
+			},
+			{
+				"name": "disp_status_cd",
+				"type": "nchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ecbeing_goods_tmp2"
+		}
+	}
+}
