@@ -1,5 +1,5 @@
 {
-	"name": "pip_ecbeing_create_target_list_3_copy1",
+	"name": "pip_ecbeing_create_target_list_3_COPY",
 	"properties": {
 		"description": "CSVファイルを新規の一時テーブルに読み込みストアド呼び出し",
 		"activities": [
