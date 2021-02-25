@@ -68,7 +68,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "MergeTmp2Info",
+						"activity": "DeleteCsv",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -104,8 +104,8 @@
 				}
 			},
 			{
-				"name": "ImportCsv2Tmp",
-				"description": "CSVファイルを一時テーブルにインポート",
+				"name": "UnzipCsv",
+				"description": "Zipファイルを解凍",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -139,104 +139,19 @@
 						}
 					},
 					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE ecbeing_goods_info;\nTRUNCATE TABLE ecbeing_goods_tmp;\n",
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": false
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
 					},
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 1
-								},
-								"sink": {
-									"name": "company_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 2
-								},
-								"sink": {
-									"name": "shop_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 3
-								},
-								"sink": {
-									"name": "dept_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 4
-								},
-								"sink": {
-									"name": "category_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 5
-								},
-								"sink": {
-									"name": "sub_category_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 6
-								},
-								"sink": {
-									"name": "jan_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 7
-								},
-								"sink": {
-									"name": "sales_promotion_cd",
-									"type": "String",
-									"physicalType": "nchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 8
-								},
-								"sink": {
-									"name": "disp_status_cd",
-									"type": "String",
-									"physicalType": "nchar"
-								}
-							}
-						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -252,18 +167,18 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "dst_ecbeing_goods_tmp",
+						"referenceName": "src_ecbeing_create_target_list_unzip",
 						"type": "DatasetReference"
 					}
 				]
 			},
 			{
-				"name": "MergeTmp2Info",
-				"description": "一時テーブルを本テーブルにマージ（重複行を除く）",
+				"name": "BulkCsv2Tmp",
+				"description": "CSVファイルを一時テーブルにBulkInsert",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ImportCsv2Tmp",
+						"activity": "UnzipCsv",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -280,13 +195,46 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "MERGE ecbeing_goods_info AS inf\nUSING ecbeing_goods_tmp  AS tmp\n   ON tmp.shop_cd = inf.shop_cd\n  AND tmp.jan_cd  = inf.jan_cd\nWHEN NOT MATCHED THEN\n    INSERT (company_cd,\n            shop_cd,\n            dept_cd,\n            category_cd,\n            sub_category_cd,\n            jan_cd,\n            sales_promotion_cd,\n            disp_status_cd\n    )\n    VALUES (tmp.company_cd,\n            tmp.shop_cd,\n            tmp.dept_cd,\n            tmp.category_cd,\n            tmp.sub_category_cd,\n            tmp.jan_cd,\n            tmp.sales_promotion_cd,\n            tmp.disp_status_cd\n    );\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "BULK INSERT ecbeing_goods_tmp\nFROM 'appdata/ftpdata/ecbeing/in/goods/ecbeing_goods.csv'\nWITH (\n    DATA_SOURCE            = 'MyAzureBlobStorage',\n    FORMATFILE_DATA_SOURCE = 'MyAzureBlobStorage',\n    FORMATFILE             = 'appdata/format/ecbeing_goods.xml');  \nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "dst_sql_none",
 						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "DeleteCsv",
+				"description": "CSVファイル削除",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "BulkCsv2Tmp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "src_ecbeing_create_target_list_unzip",
+						"type": "DatasetReference"
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
 					}
 				}
 			}
