@@ -195,7 +195,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "BULK INSERT ecbeing_goods_tmp\nFROM 'appdata/ftpdata/ecbeing/in/goods/ecbeing_goods.csv'\nWITH (\n    DATA_SOURCE            = 'MyAzureBlobStorage',\n    FORMATFILE_DATA_SOURCE = 'MyAzureBlobStorage',\n    FORMATFILE             = 'appdata/format/ecbeing_goods.xml');  \nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "TRUNCATE TABLE ecbeing_goods_info;\nBULK INSERT ecbeing_goods_info\nFROM 'appdata/ftpdata/ecbeing/in/goods/ecbeing_goods.csv'\nWITH (\n    DATA_SOURCE            = 'MyAzureBlobStorage',\n    FORMATFILE_DATA_SOURCE = 'MyAzureBlobStorage',\n    FORMATFILE             = 'appdata/format/ecbeing_goods.xml');  \nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
