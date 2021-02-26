@@ -1,0 +1,284 @@
+{
+	"name": "pip_ecbeing_create_target_list_3",
+	"properties": {
+		"description": "CSVファイルをDBに読み込みストアド呼び出し",
+		"activities": [
+			{
+				"name": "marge_error_exec_rslt_info_adf",
+				"description": "異常終了",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv2Tmp",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
+					"storedProcedureParameters": {
+						"vc_error_mode": {
+							"value": {
+								"value": "@pipeline().parameters.in_error_mode",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in_rslt",
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": "CSVファイルが存在しません。",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "next_dummy",
+				"description": "平田ストアド",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv2Tmp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "02:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in_rslt",
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": {
+								"value": "@concat('次処理呼出3 para=', pipeline().parameters.in_error_mode)",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ImportCsv2Tmp",
+				"description": "CSVファイルを一時テーブルにインポート",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings"
+							}
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE ecbeing_goods_info;",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 1
+								},
+								"sink": {
+									"name": "company_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 2
+								},
+								"sink": {
+									"name": "shop_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 3
+								},
+								"sink": {
+									"name": "dept_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 4
+								},
+								"sink": {
+									"name": "category_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 5
+								},
+								"sink": {
+									"name": "sub_category_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 6
+								},
+								"sink": {
+									"name": "jan_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 7
+								},
+								"sink": {
+									"name": "sales_promotion_cd",
+									"type": "String",
+									"physicalType": "nchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 8
+								},
+								"sink": {
+									"name": "disp_status_cd",
+									"type": "String",
+									"physicalType": "nchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "src_ecbeing_create_target_list",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "snk_ecbeing_goods_info",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "marge_normal_exec_rslt_info",
+				"description": "正常終了",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "next_dummy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in_rslt",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"in_error_mode": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": []
+	}
+}
