@@ -252,6 +252,61 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/dst_ecbeing_goods_tmp')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "company_cd",
+						"type": "nvarchar"
+					},
+					{
+						"name": "shop_cd",
+						"type": "nvarchar"
+					},
+					{
+						"name": "dept_cd",
+						"type": "nvarchar"
+					},
+					{
+						"name": "category_cd",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sub_category_cd",
+						"type": "nvarchar"
+					},
+					{
+						"name": "jan_cd",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sales_promotion_cd",
+						"type": "nchar"
+					},
+					{
+						"name": "disp_status_cd",
+						"type": "nchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ecbeing_goods_tmp"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dst_sql_none')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -695,61 +750,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "exclude_goods_info"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/snk_intac_judge_info')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "lnk_stock_sql",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "stock"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "dept_group_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "dept_group_na",
-						"type": "nvarchar"
-					},
-					{
-						"name": "dept_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "dept_na",
-						"type": "nvarchar"
-					},
-					{
-						"name": "category_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sub_category_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "env_id",
-						"type": "nvarchar"
-					},
-					{
-						"name": "disp_logic",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "intac_judge_info"
 				}
 			},
 			"dependsOn": []
