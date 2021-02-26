@@ -1,0 +1,252 @@
+{
+	"name": "pip_ecbeing_create_target_list_3_BULK",
+	"properties": {
+		"description": "CSVファイルを新規の一時テーブルに読み込みストアド呼び出し",
+		"activities": [
+			{
+				"name": "ExistsFile",
+				"description": "CSVファイルの到着待ち",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "src_ecbeing_create_target_list",
+						"type": "DatasetReference"
+					},
+					"timeout": "00:01:00",
+					"sleep": 10
+				}
+			},
+			{
+				"name": "marge_error_exec_rslt_info_adf",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ExistsFile",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
+					"storedProcedureParameters": {
+						"vc_error_mode": {
+							"value": {
+								"value": "@pipeline().parameters.in_error_mode",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in_rslt",
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": "CSVファイルが存在しません。",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "next_dummy",
+				"description": "処理終了",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "DeleteCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in_rslt",
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": {
+								"value": "@concat('次処理呼出3 para=', pipeline().parameters.in_error_mode)",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "UnzipCsv",
+				"description": "Zipファイルを解凍",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ExistsFile",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings"
+							}
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "src_ecbeing_create_target_list",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "src_ecbeing_create_target_list_unzip",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "BulkCsv2Tmp",
+				"description": "CSVファイルを一時テーブルにBulkInsert",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "UnzipCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "TRUNCATE TABLE ecbeing_goods_tmp;\nBULK INSERT ecbeing_goods_tmp\nFROM 'appdata/ftpdata/ecbeing/in/goods/ecbeing_goods.csv'\nWITH (\n    DATA_SOURCE            = 'MyAzureBlobStorage',\n    FORMATFILE_DATA_SOURCE = 'MyAzureBlobStorage',\n    FORMATFILE             = 'appdata/format/ecbeing_goods.xml');  \nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "DeleteCsv",
+				"description": "CSVファイル削除",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "BulkCsv2Tmp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "src_ecbeing_create_target_list_unzip",
+						"type": "DatasetReference"
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
+			}
+		],
+		"parameters": {
+			"in_error_mode": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": []
+	}
+}

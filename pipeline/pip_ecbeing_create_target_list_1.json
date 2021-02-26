@@ -1,0 +1,118 @@
+{
+	"name": "pip_ecbeing_create_target_list_1",
+	"properties": {
+		"description": "バッチ実行結果を参照し自JOBが当日正常終了していなければ処理続行",
+		"activities": [
+			{
+				"name": "GetJobStatus",
+				"description": "本日のバッチ実行結果を参照",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND ecbeing_goods_in_rslt_cd  = '1'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "CheckJobStatus",
+				"description": "本日のバッチ実行結果をチェック",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetJobStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(\n  equals(\n    activity('GetJobStatus').output.firstRow.cnt,\n    1\n  )\n)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "cancel_pipeline",
+							"description": "処理終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+								"storedProcedureParameters": {
+									"vc_exec_na": {
+										"value": "ecbeing_goods_in_rslt",
+										"type": "String"
+									},
+									"vc_log_text": {
+										"value": "実施済であるため、ストアド処理を起動しません。",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "next_pipeline",
+							"description": "後続処理呼出",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pip_ecbeing_create_target_list_2",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"in_error_mode": {
+										"value": "@pipeline().parameters.in_error_mode",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"in_error_mode": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": []
+	}
+}

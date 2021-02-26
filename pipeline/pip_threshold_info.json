@@ -23,7 +23,10 @@
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
+							"type": "DelimitedTextReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings"
+							}
 						}
 					},
 					"sink": {
