@@ -9,7 +9,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportCsv2Tmp",
+						"activity": "ImportCsv",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -54,7 +54,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportCsv2Tmp",
+						"activity": "ImportCsv",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -90,8 +90,8 @@
 				}
 			},
 			{
-				"name": "ImportCsv2Tmp",
-				"description": "CSVファイルを一時テーブルにインポート",
+				"name": "ImportCsv",
+				"description": "CSVファイルをインポート",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
