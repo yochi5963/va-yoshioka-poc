@@ -184,7 +184,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_jan_in_rslt',\n       2,\n       'E0070007　棚割り情報（店舗-棚）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_shop.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_jan_in_rslt',\n       2,\n       'E0070007　棚割り情報（店舗-棚）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_jan.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -259,6 +259,21 @@
 				"linkedServiceName": {
 					"referenceName": "lnk_stock_sql",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ExistsFile",
+				"description": "CSVファイルの到着待ち",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "src_blob_pattern_gz",
+						"type": "DatasetReference"
+					},
+					"timeout": "00:01:00",
+					"sleep": 10
 				}
 			}
 		],
