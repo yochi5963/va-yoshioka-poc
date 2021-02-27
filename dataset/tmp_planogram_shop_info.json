@@ -13,7 +13,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "planogram_shop_info_tmp"
+			"table": "tmp_planogram_shop_info"
 		}
 	}
 }
