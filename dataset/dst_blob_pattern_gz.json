@@ -1,0 +1,25 @@
+{
+	"name": "dst_blob_pattern_gz",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "vstockpoc"
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "gzip",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
