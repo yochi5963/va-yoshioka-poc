@@ -34,7 +34,7 @@
 							"type": "String"
 						},
 						"vc_exec_na": {
-							"value": "ecbeing_goods_in_rslt",
+							"value": "ecbeing_goods_in",
 							"type": "String"
 						},
 						"vc_log_text": {
@@ -184,7 +184,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_jan_in_rslt',\n       2,\n       'E0070007　棚割り情報（店舗-棚）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_jan.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_jan_in',\n       2,\n       'E0070007　棚割り情報（店舗-棚）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_jan.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -217,7 +217,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO planogram_jan_info (shelf_cd, jan_cd) \nSELECT shelf_cd, jan_cd\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "INSERT INTO planogram_jan_info (shelf_cd, jan_cd) \nSELECT shelf_cd, RIGHT('0000000000000' + jan_cd, 13)\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -251,7 +251,7 @@
 					"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
 					"storedProcedureParameters": {
 						"vc_exec_na": {
-							"value": "planogram_jan_in_rslt",
+							"value": "planogram_jan_in",
 							"type": "String"
 						}
 					}
