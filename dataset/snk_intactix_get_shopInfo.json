@@ -1,0 +1,44 @@
+{
+	"name": "snk_intactix_get_shopInfo",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "odbms_stock_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "odbms_brakeset_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "intac_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "tlog_umu",
+				"type": "nvarchar"
+			},
+			{
+				"name": "judge_kekka",
+				"type": "nvarchar"
+			},
+			{
+				"name": "judge_reason",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "planogram_shop_info"
+		}
+	}
+}
