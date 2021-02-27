@@ -34,7 +34,7 @@
 							"type": "String"
 						},
 						"vc_exec_na": {
-							"value": "ecbeing_goods_in_rslt",
+							"value": "ecbeing_goods_in",
 							"type": "String"
 						},
 						"vc_log_text": {
@@ -260,7 +260,7 @@
 					"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
 					"storedProcedureParameters": {
 						"vc_exec_na": {
-							"value": "ecbeing_goods_in_rslt",
+							"value": "ecbeing_goods_in",
 							"type": "String"
 						}
 					}

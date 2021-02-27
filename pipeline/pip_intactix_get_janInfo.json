@@ -260,21 +260,6 @@
 					"referenceName": "lnk_stock_sql",
 					"type": "LinkedServiceReference"
 				}
-			},
-			{
-				"name": "ExistsFile",
-				"description": "CSVファイルの到着待ち",
-				"type": "Validation",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "src_blob_pattern_gz",
-						"type": "DatasetReference"
-					},
-					"timeout": "00:01:00",
-					"sleep": 10
-				}
 			}
 		],
 		"parameters": {
