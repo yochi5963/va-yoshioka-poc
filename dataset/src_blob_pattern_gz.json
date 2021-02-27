@@ -1,5 +1,5 @@
 {
-	"name": "dst_blob_pattern_gz",
+	"name": "src_blob_pattern_gz",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "test01_link_blob",
