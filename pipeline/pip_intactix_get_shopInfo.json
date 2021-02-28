@@ -1,265 +1,275 @@
 {
-    "name": "pip_intactix_get_shopInfo",
-    "properties": {
-        "description": "取込エラー行ログ出力",
-        "activities": [
-            {
-                "name": "ImportError",
-                "description": "取込異常終了",
-                "type": "SqlServerStoredProcedure",
-                "dependsOn": [
-                    {
-                        "activity": "ImportCsv",
-                        "dependencyConditions": ["Failed"]
-                    }
-                ],
-                "policy": {
-                    "timeout": "00:01:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
-                    "storedProcedureParameters": {
-                        "vc_error_mode": {
-                            "value": {
-                                "value": "@pipeline().parameters.in_error_mode",
-                                "type": "Expression"
-                            },
-                            "type": "String"
-                        },
-                        "vc_exec_na": {
-                            "value": "ecbeing_goods_in",
-                            "type": "String"
-                        },
-                        "vc_log_text": {
-                            "value": "CSVファイルが存在しません。",
-                            "type": "String"
-                        }
-                    }
-                },
-                "linkedServiceName": {
-                    "referenceName": "lnk_stock_sql",
-                    "type": "LinkedServiceReference"
-                }
-            },
-            {
-                "name": "ImportCsv",
-                "description": "CSVファイルをインポート",
-                "type": "Copy",
-                "dependsOn": [],
-                "policy": {
-                    "timeout": "01:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "source": {
-                        "type": "DelimitedTextSource",
-                        "storeSettings": {
-                            "type": "AzureBlobStorageReadSettings",
-                            "recursive": true,
-                            "wildcardFolderPath": "appdata/ftpdata/eai/intactix/in/planogram",
-                            "wildcardFileName": "*_planogram_shop.csv.gz",
-                            "enablePartitionDiscovery": false
-                        },
-                        "formatSettings": {
-                            "type": "DelimitedTextReadSettings"
-                        }
-                    },
-                    "sink": {
-                        "type": "AzureSqlSink",
-                        "preCopyScript": "TRUNCATE TABLE planogram_shop_info;\nTRUNCATE TABLE tmp_planogram_shop_info;",
-                        "tableOption": "autoCreate",
-                        "disableMetricsCollection": false
-                    },
-                    "enableStaging": false,
-                    "translator": {
-                        "type": "TabularTranslator",
-                        "mappings": [
-                            {
-                                "source": {
-                                    "type": "String",
-                                    "physicalType": "String",
-                                    "ordinal": 1
-                                },
-                                "sink": {
-                                    "name": "store_cd",
-                                    "type": "String",
-                                    "physicalType": "nvarchar"
-                                }
-                            },
-                            {
-                                "source": {
-                                    "type": "String",
-                                    "physicalType": "String",
-                                    "ordinal": 2
-                                },
-                                "sink": {
-                                    "name": "shelf_cd",
-                                    "type": "String",
-                                    "physicalType": "nvarchar"
-                                }
-                            }
-                        ],
-                        "typeConversion": true,
-                        "typeConversionSettings": {
-                            "allowDataTruncation": true,
-                            "treatBooleanAsNumber": false
-                        }
-                    }
-                },
-                "inputs": [
-                    {
-                        "referenceName": "src_blob_pattern_gz",
-                        "type": "DatasetReference"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "referenceName": "tmp_planogram_shop_info",
-                        "type": "DatasetReference"
-                    }
-                ]
-            },
-            {
-                "name": "ValidationCheck",
-                "type": "Lookup",
-                "dependsOn": [
-                    {
-                        "activity": "ImportCsv",
-                        "dependencyConditions": ["Succeeded"]
-                    }
-                ],
-                "policy": {
-                    "timeout": "1:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "source": {
-                        "type": "AzureSqlSource",
-                        "sqlReaderQuery": "UPDATE tmp_planogram_shop_info SET validation_cd = 2\n WHERE shelf_cd IS NULL \n    OR store_cd IS NULL\n    OR LEN(shelf_cd) > 9\n    OR LEN(store_cd) > 5;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
-                        "queryTimeout": "02:00:00",
-                        "partitionOption": "None"
-                    },
-                    "dataset": {
-                        "referenceName": "dst_sql_none",
-                        "type": "DatasetReference"
-                    }
-                }
-            },
-            {
-                "name": "ErrorRowLog",
-                "type": "Lookup",
-                "dependsOn": [
-                    {
-                        "activity": "ValidationCheck",
-                        "dependencyConditions": ["Succeeded"]
-                    }
-                ],
-                "policy": {
-                    "timeout": "1:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "source": {
-                        "type": "AzureSqlSource",
-                        "sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_shop_in',\n       2,\n       'E0070007　棚割り情報（店舗-棚）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_shop.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_shop_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
-                        "queryTimeout": "02:00:00",
-                        "partitionOption": "None"
-                    },
-                    "dataset": {
-                        "referenceName": "dst_sql_none",
-                        "type": "DatasetReference"
-                    }
-                }
-            },
-            {
-                "name": "ImportTmp",
-                "description": "一時テーブルをインポート",
-                "type": "Lookup",
-                "dependsOn": [
-                    {
-                        "activity": "ErrorRowLog",
-                        "dependencyConditions": ["Succeeded"]
-                    }
-                ],
-                "policy": {
-                    "timeout": "1:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "source": {
-                        "type": "AzureSqlSource",
-                        "sqlReaderQuery": "INSERT INTO planogram_shop_info (shelf_cd, shop_cd) \nSELECT shelf_cd, RIGHT('0000000000000' + shop_cd, 13)\n  FROM tmp_planogram_shop_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
-                        "queryTimeout": "02:00:00",
-                        "partitionOption": "None"
-                    },
-                    "dataset": {
-                        "referenceName": "dst_sql_none",
-                        "type": "DatasetReference"
-                    }
-                }
-            },
-            {
-                "name": "Complete",
-                "description": "正常終了",
-                "type": "SqlServerStoredProcedure",
-                "dependsOn": [
-                    {
-                        "activity": "ImportTmp",
-                        "dependencyConditions": ["Succeeded"]
-                    }
-                ],
-                "policy": {
-                    "timeout": "00:01:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
-                    "storedProcedureParameters": {
-                        "vc_exec_na": {
-                            "value": "planogram_shop_in",
-                            "type": "String"
-                        }
-                    }
-                },
-                "linkedServiceName": {
-                    "referenceName": "lnk_stock_sql",
-                    "type": "LinkedServiceReference"
-                }
-            }
-        ],
-        "parameters": {
-            "in_error_mode": {
-                "type": "string"
-            }
-        },
-        "folder": {
-            "name": "stock"
-        },
-        "annotations": []
-    }
+	"name": "pip_intactix_get_shopInfo",
+	"properties": {
+		"description": "取込エラー行ログ出力",
+		"activities": [
+			{
+				"name": "ImportError",
+				"description": "取込異常終了",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
+					"storedProcedureParameters": {
+						"vc_error_mode": {
+							"value": {
+								"value": "@pipeline().parameters.in_error_mode",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_exec_na": {
+							"value": "ecbeing_goods_in",
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": "CSVファイルが存在しません。",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ImportCsv",
+				"description": "CSVファイルをインポート",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "appdata/ftpdata/eai/intactix/in/planogram",
+							"wildcardFileName": "*_planogram_shop.csv.gz",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE planogram_shop_info;\nTRUNCATE TABLE tmp_planogram_shop_info;",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"type": "String",
+									"physicalType": "String",
+									"ordinal": 1
+								},
+								"sink": {
+									"name": "store_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"physicalType": "String",
+									"ordinal": 2
+								},
+								"sink": {
+									"name": "shelf_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "src_blob_pattern_gz",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "tmp_planogram_shop_info",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "ValidationCheck",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "UPDATE tmp_planogram_shop_info SET validation_cd = 2\n WHERE shelf_cd IS NULL \n    OR store_cd IS NULL\n    OR LEN(shelf_cd) > 9\n    OR LEN(store_cd) > 5;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ErrorRowLog",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ValidationCheck",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_shop_in',\n       2,\n       'E0070007　棚割り情報（店舗-棚）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_shop.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_shop_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ImportTmp",
+				"description": "一時テーブルをインポート",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ErrorRowLog",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "INSERT INTO planogram_shop_info (shelf_cd, store_cd) \nSELECT shelf_cd, RIGHT('00000' + store_cd, 5)\n  FROM tmp_planogram_shop_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Complete",
+				"description": "正常終了",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportTmp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": "planogram_shop_in",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"in_error_mode": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": []
+	}
 }
