@@ -299,7 +299,7 @@
 										"type": "String"
 									},
 									"vc_exec_na": {
-										"value": "ecbeing_goods_in",
+										"value": "planogram_shop_in",
 										"type": "String"
 									},
 									"vc_log_text": {
