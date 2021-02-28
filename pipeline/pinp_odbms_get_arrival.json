@@ -427,7 +427,7 @@
 								"storedProcedureParameters": {
 									"vc_error_mode": {
 										"value": {
-											"value": "@pipeline().parameters.in_error_mode",
+											"value": "2",
 											"type": "Expression"
 										},
 										"type": "String"
