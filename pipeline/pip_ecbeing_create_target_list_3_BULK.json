@@ -239,6 +239,7 @@
 				}
 			}
 		],
+		"concurrency": 1,
 		"parameters": {
 			"in_error_mode": {
 				"type": "string"
