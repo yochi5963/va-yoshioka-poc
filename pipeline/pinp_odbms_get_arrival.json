@@ -52,7 +52,7 @@
 			},
 			{
 				"name": "ImportCsv",
-				"description": "CSVファイルをインポート",
+				"description": "複数CSVファイルをインポート",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
