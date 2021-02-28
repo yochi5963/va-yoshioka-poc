@@ -19,7 +19,8 @@
 				}
 			},
 			{
-				"name": "marge_error_exec_rslt_info_adf",
+				"name": "ImportError1",
+				"description": "取込異常終了",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{

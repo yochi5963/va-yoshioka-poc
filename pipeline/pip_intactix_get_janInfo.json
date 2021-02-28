@@ -1,10 +1,9 @@
 {
 	"name": "pip_intactix_get_janInfo",
 	"properties": {
-		"description": "取込エラー行ログ出力",
 		"activities": [
 			{
-				"name": "ImportError",
+				"name": "ImportError1",
 				"description": "取込異常終了",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
@@ -164,6 +163,7 @@
 			},
 			{
 				"name": "ErrorRowLog",
+				"description": "取込エラー行ログ出力",
 				"type": "Lookup",
 				"dependsOn": [
 					{

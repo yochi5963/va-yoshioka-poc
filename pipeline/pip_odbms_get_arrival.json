@@ -1,5 +1,5 @@
 {
-	"name": "pip_intactix_get_shopInfo",
+	"name": "pip_odbms_get_arrival",
 	"properties": {
 		"activities": [
 			{
@@ -33,7 +33,7 @@
 							"type": "String"
 						},
 						"vc_exec_na": {
-							"value": "planogram_shop_in",
+							"value": "planogram_jan_in",
 							"type": "String"
 						},
 						"vc_log_text": {
@@ -67,7 +67,7 @@
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"wildcardFolderPath": "appdata/ftpdata/eai/intactix/in/planogram",
-							"wildcardFileName": "*_planogram_shop.csv.gz",
+							"wildcardFileName": "*_planogram_jan.csv.gz",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -76,7 +76,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE planogram_shop_info;\nTRUNCATE TABLE tmp_planogram_shop_info;",
+						"preCopyScript": "TRUNCATE TABLE planogram_jan_info;\nTRUNCATE TABLE tmp_planogram_jan_info;",
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
@@ -91,7 +91,7 @@
 									"ordinal": 1
 								},
 								"sink": {
-									"name": "store_cd",
+									"name": "shelf_cd",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -103,9 +103,9 @@
 									"ordinal": 2
 								},
 								"sink": {
-									"name": "shelf_cd",
-									"type": "String",
-									"physicalType": "nvarchar"
+									"name": "jan_cd",
+									"type": "Int64",
+									"physicalType": "bigint"
 								}
 							}
 						],
@@ -124,7 +124,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "tmp_planogram_shop_info",
+						"referenceName": "tmp_planogram_jan_info",
 						"type": "DatasetReference"
 					}
 				]
@@ -151,7 +151,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_planogram_shop_info SET validation_cd = 2\n WHERE shelf_cd IS NULL \n    OR store_cd IS NULL\n    OR LEN(shelf_cd) > 9\n    OR LEN(store_cd) > 5;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_planogram_jan_info SET validation_cd = 2\n WHERE shelf_cd IS NULL \n    OR jan_cd IS NULL\n    OR LEN(shelf_cd) > 9\n    OR LEN(jan_cd) > 13;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -184,7 +184,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_shop_in',\n       2,\n       'E0070007　棚割り情報（店舗-棚）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_shop.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_shop_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_jan_in',\n       2,\n       'E0070008　棚割り情報（棚-商品）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_jan.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -217,13 +217,34 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO planogram_shop_info (shelf_cd, store_cd) \nSELECT shelf_cd, RIGHT('00000' + store_cd, 5)\n  FROM tmp_planogram_shop_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "INSERT INTO planogram_jan_info (shelf_cd, jan_cd) \nSELECT shelf_cd, RIGHT('0000000000000' + jan_cd, 13)\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "dst_sql_none",
 						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "SetRowsRead",
+				"description": "読込行数取得",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "rowsRead",
+					"value": {
+						"value": "@concat(activity('ImportCsv').output. rowsRead)",
+						"type": "Expression"
 					}
 				}
 			},
@@ -263,7 +284,7 @@
 								"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
 								"storedProcedureParameters": {
 									"vc_exec_na": {
-										"value": "planogram_shop_in",
+										"value": "planogram_jan_in",
 										"type": "String"
 									}
 								}
@@ -299,7 +320,7 @@
 										"type": "String"
 									},
 									"vc_exec_na": {
-										"value": "planogram_shop_in",
+										"value": "planogram_jan_in",
 										"type": "String"
 									},
 									"vc_log_text": {
@@ -314,27 +335,6 @@
 							}
 						}
 					]
-				}
-			},
-			{
-				"name": "SetRowsRead",
-				"description": "読込行数取得",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "ImportCsv",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "rowsRead",
-					"value": {
-						"value": "@concat(activity('ImportCsv').output. rowsRead)",
-						"type": "Expression"
-					}
 				}
 			}
 		],
