@@ -8,7 +8,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportCsvs",
+						"activity": "ImportCsv",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -51,8 +51,8 @@
 				}
 			},
 			{
-				"name": "ImportCsvs",
-				"description": "複数CSVファイルをインポート",
+				"name": "ImportCsv",
+				"description": "CSVファイルをインポート",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -200,7 +200,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ImportCsvs",
+						"activity": "ImportCsv",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -266,7 +266,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "ImportCsvs",
+						"activity": "ImportCsv",
 						"dependencyConditions": [
 							"Succeeded"
 						]
