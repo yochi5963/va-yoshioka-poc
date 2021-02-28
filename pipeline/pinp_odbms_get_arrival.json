@@ -53,7 +53,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "hoge",
+						"activity": "SetTarget",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -348,7 +348,7 @@
 				}
 			},
 			{
-				"name": "hoge",
+				"name": "SetTarget",
 				"description": "処理対象設定",
 				"type": "Switch",
 				"dependsOn": [],
@@ -370,7 +370,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"variableName": "batch_exec_rslt_name",
-										"value": "'odbms_arriv_gm_in'"
+										"value": "odbms_arriv_gm_in"
 									}
 								}
 							]
@@ -386,7 +386,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"variableName": "batch_exec_rslt_name",
-										"value": "'odbms_arriv_gr_in'"
+										"value": "odbms_arriv_gr_in"
 									}
 								}
 							]
@@ -402,7 +402,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"variableName": "batch_exec_rslt_name",
-										"value": "'odbms_arriv_md_in'"
+										"value": "odbms_arriv_md_in"
 									}
 								}
 							]
