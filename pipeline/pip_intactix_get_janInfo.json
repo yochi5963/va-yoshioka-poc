@@ -4,8 +4,8 @@
 		"description": "取込エラー行ログ出力",
 		"activities": [
 			{
-				"name": "marge_error_exec_rslt_info_adf",
-				"description": "異常終了",
+				"name": "ImportError",
+				"description": "取込異常終了",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -228,7 +228,7 @@
 				}
 			},
 			{
-				"name": "marge_normal_exec_rslt_info",
+				"name": "Complete",
 				"description": "正常終了",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
