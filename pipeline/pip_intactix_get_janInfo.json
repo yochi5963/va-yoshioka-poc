@@ -162,45 +162,12 @@
 				}
 			},
 			{
-				"name": "ErrorRowLog",
-				"description": "取込エラー行ログ出力",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ValidationCheck",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "1:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_jan_in',\n       2,\n       'E0070008　棚割り情報（棚-商品）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_jan.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "dst_sql_none",
-						"type": "DatasetReference"
-					}
-				}
-			},
-			{
 				"name": "ImportTmp",
 				"description": "一時テーブルをインポート",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ErrorRowLog",
+						"activity": "ValidationErrorLog",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -336,12 +303,50 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "ValidationErrorLog",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ValidationCheck",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[insert_validation1_error_exec_log]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": "planogram_jan_in",
+							"type": "String"
+						},
+						"vc_tmp_table": {
+							"value": "tmp_planogram_jan_info",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"concurrency": 1,
 		"parameters": {
 			"in_error_mode": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "2"
 			}
 		},
 		"variables": {

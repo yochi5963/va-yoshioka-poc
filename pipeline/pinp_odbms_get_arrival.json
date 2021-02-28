@@ -33,7 +33,10 @@
 							"type": "String"
 						},
 						"vc_exec_na": {
-							"value": "planogram_jan_in",
+							"value": {
+								"value": "@variables('batch_exec_rslt_name')",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"vc_log_text": {
@@ -86,7 +89,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE planogram_jan_info;\nTRUNCATE TABLE tmp_planogram_jan_info;",
+						"preCopyScript": "TRUNCATE TABLE tmp_odbms_arrival_info;",
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
@@ -101,7 +104,7 @@
 									"ordinal": 1
 								},
 								"sink": {
-									"name": "shelf_cd",
+									"name": "store_cd",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -113,9 +116,69 @@
 									"ordinal": 2
 								},
 								"sink": {
+									"name": "dept_cd",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"physicalType": "String",
+									"ordinal": 3
+								},
+								"sink": {
 									"name": "jan_cd",
-									"type": "Int64",
-									"physicalType": "bigint"
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"physicalType": "String",
+									"ordinal": 4
+								},
+								"sink": {
+									"name": "order_quantity",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"physicalType": "String",
+									"ordinal": 5
+								},
+								"sink": {
+									"name": "order_date",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"physicalType": "String",
+									"ordinal": 6
+								},
+								"sink": {
+									"name": "arrival_date",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"physicalType": "String",
+									"ordinal": 7
+								},
+								"sink": {
+									"name": "exec_date",
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							}
 						],
@@ -134,7 +197,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "tmp_planogram_jan_info",
+						"referenceName": "tmp_odbms_arrival_info",
 						"type": "DatasetReference"
 					}
 				]
@@ -161,7 +224,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_planogram_jan_info SET validation_cd = 2\n WHERE shelf_cd IS NULL \n    OR jan_cd IS NULL\n    OR LEN(shelf_cd) > 9\n    OR LEN(jan_cd) > 13;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_odbms_arrival_info SET validation_cd = 2\n WHERE store_cd IS NULL \n    OR jan_cd IS NULL\n    OR order_quantity IS NULL\n    OR arrival_date IS NULL\n    OR LEN(store_cd) > 5\n    OR LEN(dept_cd) > 3\n    OR LEN(jan_cd) > 13\n    OR LEN(order_quantity) > 7\n    OR LEN(order_date) > 8\n    OR LEN(arrival_date) > 8\n    OR LEN(exec_date) > 8;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -194,7 +257,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO exec_log (exec_na, log_type, log_text) \nSELECT 'planogram_jan_in',\n       2,\n       'E0070008　棚割り情報（棚-商品）取込　レコードエラー' +\n       '　ファイル名：[YYYYMMDD_planogram_jan.csv.gz]' +\n       '　行：[' + CONVERT(VARCHAR,seq_no) + ']'\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 2;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": {
+							"value": "@concat (\n    'INSERT INTO exec_log (exec_na, log_type, log_text) ',\n    'SELECT ''PARA1'', 2, ''E0070002　ODBMS発注情報取込　レコードエラー　ファイル名：[YYYYMMDD_PARA2_order.csv.gz]　行：['' + CONVERT(VARCHAR,seq_no) + '']''',\n    '  FROM tmp_odbms_arrival_info',\n    ' WHERE validation_cd = 2;',\n    'SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)\n",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -227,7 +293,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO planogram_jan_info (shelf_cd, jan_cd) \nSELECT shelf_cd, RIGHT('0000000000000' + jan_cd, 13)\n  FROM tmp_planogram_jan_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "INSERT INTO odbms_arrival_info (\n    store_cd, dept_cd, jan_cd, order_quantity,\n    order_date, arrival_date, exec_date, env_id\n) \nSELECT\n    RIGHT('00000' + store_cd, 5),\n    dept_cd,\n    RIGHT('0000000000000' + jan_cd, 13),\n    order_quantity,\n    order_date,\n    arrival_date,\n    exec_date,\n    @variables('batch_exec_rslt_name')\n  FROM tmp_odbms_arrival_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -294,7 +360,10 @@
 								"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
 								"storedProcedureParameters": {
 									"vc_exec_na": {
-										"value": "planogram_jan_in",
+										"value": {
+											"value": "@variables('batch_exec_rslt_name')",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
@@ -330,7 +399,10 @@
 										"type": "String"
 									},
 									"vc_exec_na": {
-										"value": "planogram_jan_in",
+										"value": {
+											"value": "@variables('batch_exec_rslt_name')",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"vc_log_text": {
@@ -449,15 +521,54 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "SetTarget",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "query",
+					"value": "@concat (\n    'INSERT INTO exec_log (exec_na, log_type, log_text) ',\n    'SELECT ''PARA1'', 2, ''E0070002　ODBMS発注情報取込　レコードエラー　ファイル名：[YYYYMMDD_PARA2_order.csv.gz]　行：['' + CONVERT(VARCHAR,seq_no) + '']''',\n    '  FROM tmp_odbms_arrival_info',\n    ' WHERE validation_cd = 2;',\n    'SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)"
+				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "query",
+					"value": {
+						"value": "@replace (\n  variables('query'),\n  'PARA1',\n  'PALA1\n)\n",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"concurrency": 1,
 		"parameters": {
 			"in_error_mode": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "2"
 			},
 			"in_target": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "GM"
 			}
 		},
 		"variables": {
@@ -465,6 +576,9 @@
 				"type": "String"
 			},
 			"batch_exec_rslt_name": {
+				"type": "String"
+			},
+			"query": {
 				"type": "String"
 			}
 		},
