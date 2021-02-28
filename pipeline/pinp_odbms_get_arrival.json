@@ -250,7 +250,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "@concat(\n    'INSERT INTO odbms_arrival_info (',\n    '    store_cd, dept_cd, jan_cd, order_quantity,',\n    '    order_date, arrival_date, exec_date, env_id',\n    ') ',\n    'SELECT',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    dept_cd,',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    order_quantity,',\n    '    order_date,',\n    '    arrival_date,',\n    '    exec_date,',\n    pipeline().parameters.in_exec_na\n)",
+						"sqlReaderQuery": "@concat(\n    'INSERT INTO odbms_arrival_info (',\n    '    store_cd, dept_cd, jan_cd, order_quantity,',\n    '    order_date, arrival_date, exec_date, env_id',\n    ') ',\n    ' SELECT',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    dept_cd,',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    order_quantity,',\n    '    order_date,',\n    '    arrival_date,',\n    '    exec_date,',\n    '    ''', pipeline().parameters.in_target, '''',\n    ' FROM tmp_odbms_arrival_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
