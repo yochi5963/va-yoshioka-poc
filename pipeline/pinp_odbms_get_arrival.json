@@ -34,7 +34,7 @@
 						},
 						"vc_exec_na": {
 							"value": {
-								"value": "@variables('batch_exec_rslt_name')",
+								"value": "@pipeline().parameters.in_exec_na",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -54,14 +54,7 @@
 				"name": "ImportCsv",
 				"description": "CSVファイルをインポート",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "SetTarget",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "01:00:00",
 					"retry": 0,
@@ -235,48 +228,12 @@
 				}
 			},
 			{
-				"name": "ErrorRowLog",
-				"description": "取込エラー行ログ出力",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ValidationCheck",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "1:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "@concat (\n    'INSERT INTO exec_log (exec_na, log_type, log_text) ',\n    'SELECT ''PARA1'', 2, ''E0070002　ODBMS発注情報取込　レコードエラー　ファイル名：[YYYYMMDD_PARA2_order.csv.gz]　行：['' + CONVERT(VARCHAR,seq_no) + '']''',\n    '  FROM tmp_odbms_arrival_info',\n    ' WHERE validation_cd = 2;',\n    'SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)\n",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "dst_sql_none",
-						"type": "DatasetReference"
-					}
-				}
-			},
-			{
 				"name": "ImportTmp",
 				"description": "一時テーブルをインポート",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ErrorRowLog",
+						"activity": "ValidationErrorLog",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -293,7 +250,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO odbms_arrival_info (\n    store_cd, dept_cd, jan_cd, order_quantity,\n    order_date, arrival_date, exec_date, env_id\n) \nSELECT\n    RIGHT('00000' + store_cd, 5),\n    dept_cd,\n    RIGHT('0000000000000' + jan_cd, 13),\n    order_quantity,\n    order_date,\n    arrival_date,\n    exec_date,\n    @variables('batch_exec_rslt_name')\n  FROM tmp_odbms_arrival_info\n WHERE validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "@concat(\n    'INSERT INTO odbms_arrival_info (',\n    '    store_cd, dept_cd, jan_cd, order_quantity,',\n    '    order_date, arrival_date, exec_date, env_id',\n    ') ',\n    'SELECT',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    dept_cd,',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    order_quantity,',\n    '    order_date,',\n    '    arrival_date,',\n    '    exec_date,',\n    pipeline().parameters.in_exec_na\n)",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -361,7 +318,7 @@
 								"storedProcedureParameters": {
 									"vc_exec_na": {
 										"value": {
-											"value": "@variables('batch_exec_rslt_name')",
+											"value": "@pipeline().parameters.in_exec_na",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -400,7 +357,7 @@
 									},
 									"vc_exec_na": {
 										"value": {
-											"value": "@variables('batch_exec_rslt_name')",
+											"value": "@pipeline().parameters.in_exec_na",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -420,143 +377,43 @@
 				}
 			},
 			{
-				"name": "SetTarget",
-				"description": "処理対象設定",
-				"type": "Switch",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"on": {
-						"value": "@pipeline().parameters.in_target",
-						"type": "Expression"
-					},
-					"cases": [
-						{
-							"value": "GM",
-							"activities": [
-								{
-									"name": "SetTargetGM",
-									"description": "",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "batch_exec_rslt_name",
-										"value": "odbms_arriv_gm_in"
-									}
-								}
-							]
-						},
-						{
-							"value": "GR",
-							"activities": [
-								{
-									"name": "SetTargetGR",
-									"description": "",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "batch_exec_rslt_name",
-										"value": "odbms_arriv_gr_in"
-									}
-								}
-							]
-						},
-						{
-							"value": "MD",
-							"activities": [
-								{
-									"name": "SetTargetMD",
-									"description": "",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "batch_exec_rslt_name",
-										"value": "odbms_arriv_md_in"
-									}
-								}
-							]
-						}
-					],
-					"defaultActivities": [
-						{
-							"name": "TargetError1",
-							"description": "処理対象異常終了",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "00:01:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
-								"storedProcedureParameters": {
-									"vc_error_mode": {
-										"value": {
-											"value": "2",
-											"type": "Expression"
-										},
-										"type": "String"
-									},
-									"vc_exec_na": {
-										"value": "odbms_arriv_gm_in",
-										"type": "String"
-									},
-									"vc_log_text": {
-										"value": "処理対象が正しくありません。",
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "lnk_stock_sql",
-								"type": "LinkedServiceReference"
-							}
-						}
-					]
-				}
-			},
-			{
-				"name": "Set variable1",
-				"type": "SetVariable",
+				"name": "ValidationErrorLog",
+				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "SetTarget",
+						"activity": "ValidationCheck",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
+				"policy": {
+					"timeout": "01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "query",
-					"value": "@concat (\n    'INSERT INTO exec_log (exec_na, log_type, log_text) ',\n    'SELECT ''PARA1'', 2, ''E0070002　ODBMS発注情報取込　レコードエラー　ファイル名：[YYYYMMDD_PARA2_order.csv.gz]　行：['' + CONVERT(VARCHAR,seq_no) + '']''',\n    '  FROM tmp_odbms_arrival_info',\n    ' WHERE validation_cd = 2;',\n    'SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)"
-				}
-			},
-			{
-				"name": "Set variable2",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set variable1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
+					"storedProcedureName": "[dbo].[insert_validation1_error_exec_log]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": {
+								"value": "@pipeline().parameters.in_exec_na",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_tmp_table": {
+							"value": "tmp_odbms_arrival_info",
+							"type": "String"
+						}
 					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "query",
-					"value": {
-						"value": "@replace (\n  variables('query'),\n  'PARA1',\n  'PALA1\n)\n",
-						"type": "Expression"
-					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
@@ -569,16 +426,14 @@
 			"in_target": {
 				"type": "string",
 				"defaultValue": "GM"
+			},
+			"in_exec_na": {
+				"type": "string",
+				"defaultValue": "odbms_arriv_gm_in"
 			}
 		},
 		"variables": {
 			"rowsRead": {
-				"type": "String"
-			},
-			"batch_exec_rslt_name": {
-				"type": "String"
-			},
-			"query": {
 				"type": "String"
 			}
 		},
