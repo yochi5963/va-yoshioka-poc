@@ -4,7 +4,7 @@
 		"description": "取込エラー行ログ出力",
 		"activities": [
 			{
-				"name": "ImportError",
+				"name": "ImportError1",
 				"description": "取込異常終了",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
@@ -34,7 +34,7 @@
 							"type": "String"
 						},
 						"vc_exec_na": {
-							"value": "ecbeing_goods_in",
+							"value": "planogram_shop_in",
 							"type": "String"
 						},
 						"vc_log_text": {
@@ -228,9 +228,9 @@
 				}
 			},
 			{
-				"name": "Complete",
-				"description": "正常終了",
-				"type": "SqlServerStoredProcedure",
+				"name": "IfRowsRead",
+				"description": "CSV読込行数により分岐",
+				"type": "IfCondition",
 				"dependsOn": [
 					{
 						"activity": "ImportTmp",
@@ -239,32 +239,113 @@
 						]
 					}
 				],
-				"policy": {
-					"timeout": "00:01:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
-					"storedProcedureParameters": {
-						"vc_exec_na": {
-							"value": "planogram_shop_in",
-							"type": "String"
+					"expression": {
+						"value": "@equals(variables('rowsRead'),'0')\n\n",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Complete",
+							"description": "正常終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
+								"storedProcedureParameters": {
+									"vc_exec_na": {
+										"value": "planogram_shop_in",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
 						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "ImportError2",
+							"description": "取込異常終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
+								"storedProcedureParameters": {
+									"vc_error_mode": {
+										"value": {
+											"value": "@pipeline().parameters.in_error_mode",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"vc_exec_na": {
+										"value": "ecbeing_goods_in",
+										"type": "String"
+									},
+									"vc_log_text": {
+										"value": "CSVファイルが空か、存在しません。",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "SetRowsRead",
+				"description": "読込行数取得",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "lnk_stock_sql",
-					"type": "LinkedServiceReference"
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "rowsRead",
+					"value": {
+						"value": "@concat(activity('ImportCsv').output. rowsRead)",
+						"type": "Expression"
+					}
 				}
 			}
 		],
 		"parameters": {
 			"in_error_mode": {
 				"type": "string"
+			}
+		},
+		"variables": {
+			"rowsRead": {
+				"type": "String"
 			}
 		},
 		"folder": {
