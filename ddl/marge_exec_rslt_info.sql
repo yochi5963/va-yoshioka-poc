@@ -4,7 +4,7 @@
 --*  @vc_exec_na         : 処理名
 --*  @vc_rslt_cd         : 処理結果 (1:OK 2:NG)
 --* [呼び出し例]
---*  exec marge_exec_rslt_info 'ecbeing_goods_in_rslt', '1';
+--*  exec marge_exec_rslt_info 'ecbeing_goods_in', '1';
 --**************************************************************************************
 CREATE OR ALTER PROCEDURE dbo.marge_exec_rslt_info
 (
@@ -26,9 +26,9 @@ BEGIN
             ' USING (SELECT null as dmy) AS dummy' +
             '	ON (rslt.exec_dt = ' + @S_EXEC_DT + ')' +
             ' WHEN MATCHED THEN' +
-            '	UPDATE SET ' + @vc_exec_na + '_tm = ' + @S_EXEC_TM + '' +
+            '	UPDATE SET ' + @vc_exec_na + '_rslt_tm = ' + @S_EXEC_TM + '' +
             ' WHEN NOT MATCHED THEN ' +
-            '	INSERT (exec_dt, ' + @vc_exec_na + '_tm)' +
+            '	INSERT (exec_dt, ' + @vc_exec_na + '_rslt_tm)' +
             '	VALUES (' + @S_EXEC_DT + ', ' + @S_EXEC_TM + ');'
         );
     END ELSE BEGIN
@@ -37,10 +37,10 @@ BEGIN
             ' USING (SELECT null as dmy) AS dummy' +
             '	ON (rslt.exec_dt = ' + @S_EXEC_DT + ')' +
             ' WHEN MATCHED THEN' +
-            '	UPDATE SET ' + @vc_exec_na + '_cd = ' + @vc_rslt_cd + ',' +
-            '	           ' + @vc_exec_na + '_tm = ' + @S_EXEC_TM + '' +
+            '	UPDATE SET ' + @vc_exec_na + '_rslt_cd = ' + @vc_rslt_cd + ',' +
+            '	           ' + @vc_exec_na + '_rslt_tm = ' + @S_EXEC_TM + '' +
             ' WHEN NOT MATCHED THEN ' +
-            '	INSERT (exec_dt, ' + @vc_exec_na + '_cd, ' + @vc_exec_na + '_tm)' +
+            '	INSERT (exec_dt, ' + @vc_exec_na + '_rslt_cd, ' + @vc_exec_na + '_rslt_tm)' +
             '	VALUES (' + @S_EXEC_DT + ', ' + @vc_rslt_cd + ', ' + @S_EXEC_TM + ');'
         );
     END
