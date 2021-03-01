@@ -396,7 +396,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[insert_validation1_error_exec_log]",
+					"storedProcedureName": "[dbo].[insert_validation_log]",
 					"storedProcedureParameters": {
 						"vc_exec_na": {
 							"value": {
