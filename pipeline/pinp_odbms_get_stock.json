@@ -80,6 +80,9 @@
 							"type": "DelimitedTextReadSettings"
 						}
 					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
@@ -162,6 +165,12 @@
 						"referenceName": "src_blob_pattern_gz",
 						"type": "DatasetReference"
 					}
+				],
+				"outputs": [
+					{
+						"referenceName": "tmp_odbms_stock_info",
+						"type": "DatasetReference"
+					}
 				]
 			},
 			{
@@ -202,7 +211,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ValidationErrorLog",
+						"activity": "ValidationLog",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -220,7 +229,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n    'INSERT INTO odbms_stock_info (',\n    '    store_cd, dept_cd, jan_cd, order_quantity,',\n    '    order_date, stock_date, exec_date, env_id',\n    ') ',\n    ' SELECT',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    dept_cd,',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    order_quantity,',\n    '    order_date,',\n    '    stock_date,',\n    '    exec_date,',\n    '    ''', pipeline().parameters.in_target, '''',\n    ' FROM tmp_odbms_stock_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
+							"value": "@concat(\n    'INSERT INTO odbms_stock_info (',\n    '    calc_date, store_cd, jan_cd,',\n    '    term_stock, dept_cd, env_id',\n    ') ',\n    ' SELECT',\n    '    calc_date,',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    term_stock,',\n    '    dept_cd,',\n    '    ''', pipeline().parameters.in_target, '''',\n    ' FROM tmp_odbms_stock_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -349,11 +358,11 @@
 				}
 			},
 			{
-				"name": "ValidationErrorLog",
+				"name": "ValidationLog",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ValidationCheck",
+						"activity": "ExistsCheck",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -386,6 +395,38 @@
 				"linkedServiceName": {
 					"referenceName": "lnk_stock_sql",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ExistsCheck",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ValidationCheck",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 3\n  FROM tmp_odbms_stock_info AS tmp\n INNER JOIN odbms_stock_info AS inf\n    ON inf.store_cd = tmp.store_cd\n   AND inf.jan_cd = tmp.jan_cd\n WHERE tmp.validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
 				}
 			}
 		],
