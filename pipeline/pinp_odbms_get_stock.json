@@ -71,7 +71,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/stock",
 							"wildcardFileName": {
-								"value": "@concat(\n  '*_',\n  pipeline().parameters.in_target,\n  '_order.csv.gz'\n)",
+								"value": "@concat(\n  '*_',\n  pipeline().parameters.in_target,\n  '_stock.csv.gz'\n)",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -93,7 +93,7 @@
 									"ordinal": 1
 								},
 								"sink": {
-									"name": "store_cd",
+									"name": "calc_date",
 									"type": "String"
 								}
 							},
@@ -103,7 +103,7 @@
 									"ordinal": 2
 								},
 								"sink": {
-									"name": "dept_cd",
+									"name": "store_cd",
 									"type": "String"
 								}
 							},
@@ -123,7 +123,7 @@
 									"ordinal": 4
 								},
 								"sink": {
-									"name": "order_quantity",
+									"name": "term_stock",
 									"type": "String"
 								}
 							},
@@ -133,27 +133,7 @@
 									"ordinal": 5
 								},
 								"sink": {
-									"name": "order_date",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 6
-								},
-								"sink": {
-									"name": "stock_date",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 7
-								},
-								"sink": {
-									"name": "exec_date",
+									"name": "dept_cd",
 									"type": "String"
 								}
 							}
