@@ -233,7 +233,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ValidationErrorLog",
+						"activity": "ValidationLog",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -377,7 +377,7 @@
 				}
 			},
 			{
-				"name": "ValidationErrorLog",
+				"name": "ValidationLog",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
