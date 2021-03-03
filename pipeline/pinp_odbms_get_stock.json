@@ -404,7 +404,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 4\n  FROM tmp_odbms_stock_info AS tmp\n INNER JOIN odbms_stock_info AS inf\n    ON inf.store_cd = tmp.store_cd\n   AND inf.jan_cd = tmp.jan_cd\n WHERE tmp.validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 4\n  FROM tmp_odbms_stock_info AS tmp\n INNER JOIN odbms_stock_info AS inf\n    ON inf.store_cd = RIGHT('00000' + tmp.store_cd, 5),\n   AND inf.jan_cd = RIGHT('0000000000000' + tmp.jan_cd, 13)\n WHERE tmp.validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
