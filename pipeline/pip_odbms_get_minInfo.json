@@ -69,9 +69,9 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/stock",
+							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/mini",
 							"wildcardFileName": {
-								"value": "@concat(\n  '*_',\n  pipeline().parameters.in_target,\n  '_stock.csv.gz'\n)",
+								"value": "@concat(\n  '*_',\n  pipeline().parameters.in_target,\n  '_mini.csv.gz'\n)",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -82,7 +82,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE tmp_odbms_stock_info;",
+						"preCopyScript": {
+							"value": "@{concat(\n    'TRUNCATE TABLE tmp_odbms_mini_info;',\n    'DELETE FROM odbms_mini_info WHERE ENV_ID = ',\n    '    ''', pipeline().parameters.in_target, ''';'\n)}",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -95,7 +98,7 @@
 									"ordinal": 1
 								},
 								"sink": {
-									"name": "calc_date",
+									"name": "store_cd",
 									"type": "String"
 								}
 							},
@@ -105,7 +108,7 @@
 									"ordinal": 2
 								},
 								"sink": {
-									"name": "store_cd",
+									"name": "jan_cd",
 									"type": "String"
 								}
 							},
@@ -115,27 +118,7 @@
 									"ordinal": 3
 								},
 								"sink": {
-									"name": "jan_cd",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 4
-								},
-								"sink": {
-									"name": "term_stock",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 5
-								},
-								"sink": {
-									"name": "dept_cd",
+									"name": "threshold_num",
 									"type": "String"
 								}
 							}
@@ -150,7 +133,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "tmp_odbms_stock_info",
+						"referenceName": "tmp_odbms_mini_info",
 						"type": "DatasetReference"
 					}
 				]
@@ -178,7 +161,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 2\n WHERE calc_date IS NULL \n    OR store_cd IS NULL\n    OR jan_cd IS NULL\n    OR term_stock IS NULL\n    OR LEN(calc_date) > 8\n    OR LEN(store_cd) > 5\n    OR LEN(jan_cd) > 13\n    OR LEN(term_stock) > 10\n    OR LEN(dept_cd) > 3;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_odbms_mini_info SET validation_cd = 2\n WHERE store_cd IS NULL\n    OR jan_cd IS NULL\n    OR LEN(store_cd) > 5\n    OR LEN(jan_cd) > 13\n    OR LEN(threshold_num) > 12;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -212,7 +195,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n    'INSERT INTO odbms_stock_info (',\n    '    calc_date, store_cd, jan_cd,',\n    '    term_stock, dept_cd, env_id',\n    ') ',\n    ' SELECT',\n    '    calc_date,',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    term_stock,',\n    '    dept_cd,',\n    '    ''', pipeline().parameters.in_target, '''',\n    ' FROM tmp_odbms_stock_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
+							"value": "@concat(\n    'INSERT INTO odbms_mini_info (',\n    '    calc_date, store_cd, jan_cd,',\n    '    term_mini, dept_cd, env_id',\n    ') ',\n    ' SELECT',\n    '    calc_date,',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    term_mini,',\n    '    dept_cd,',\n    '    ''', pipeline().parameters.in_target, '''',\n    ' FROM tmp_odbms_mini_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -346,7 +329,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExistsCheck",
+						"activity": "DupeCheck",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -371,7 +354,7 @@
 							"type": "String"
 						},
 						"vc_tmp_table": {
-							"value": "tmp_odbms_stock_info",
+							"value": "tmp_odbms_mini_info",
 							"type": "String"
 						}
 					}
@@ -379,39 +362,6 @@
 				"linkedServiceName": {
 					"referenceName": "lnk_stock_sql",
 					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "ExistsCheck",
-				"description": "取込既存チェック",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "DupeCheck",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "1:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 4\n  FROM tmp_odbms_stock_info AS tmp\n INNER JOIN odbms_stock_info AS inf\n    ON inf.store_cd = RIGHT('00000' + tmp.store_cd, 5)\n   AND inf.jan_cd = RIGHT('0000000000000' + tmp.jan_cd, 13)\n WHERE tmp.validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "dst_sql_none",
-						"type": "DatasetReference"
-					}
 				}
 			},
 			{
@@ -437,7 +387,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 3\n  FROM tmp_odbms_stock_info AS tmp\n WHERE tmp.seq_no IN (\n        SELECT seq_no\n          FROM (\n            SELECT seq_no, store_cd, jan_cd, ROW_NUMBER() OVER(PARTITION BY store_cd,jan_cd ORDER BY seq_no asc) AS row_no\n              FROM tmp_odbms_stock_info\n             WHERE validation_cd = 1\n        ) AS dupe\n        WHERE row_no <> 1\n);\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_odbms_mini_info SET validation_cd = 3\n  FROM tmp_odbms_mini_info AS tmp\n WHERE tmp.seq_no IN (\n        SELECT seq_no\n          FROM (\n            SELECT seq_no, store_cd, jan_cd, ROW_NUMBER() OVER(PARTITION BY store_cd,jan_cd ORDER BY seq_no asc) AS row_no\n              FROM tmp_odbms_mini_info\n             WHERE validation_cd = 1\n        ) AS dupe\n        WHERE row_no <> 1\n);\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -460,7 +410,7 @@
 			},
 			"in_exec_na": {
 				"type": "string",
-				"defaultValue": "odbms_stock_gm_in"
+				"defaultValue": "odbms_mini_gm_in"
 			}
 		},
 		"variables": {
@@ -469,7 +419,7 @@
 			}
 		},
 		"folder": {
-			"name": "stock"
+			"name": "mini"
 		},
 		"annotations": []
 	}
