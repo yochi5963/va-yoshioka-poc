@@ -1,5 +1,5 @@
 {
-	"name": "pinp_odbms_get_stock",
+	"name": "pip_odbms_get_stock",
 	"properties": {
 		"activities": [
 			{
