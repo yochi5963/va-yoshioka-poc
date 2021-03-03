@@ -81,7 +81,9 @@
 						}
 					},
 					"sink": {
-						"type": "AzureSqlSink"
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE tmp_odbms_stock_info;",
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
