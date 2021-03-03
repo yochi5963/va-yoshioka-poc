@@ -157,6 +157,7 @@
 			},
 			{
 				"name": "ValidationCheck",
+				"description": "バリデーションチェック",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -341,6 +342,7 @@
 			},
 			{
 				"name": "ValidationLog",
+				"description": "バリデーションログ",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -381,6 +383,40 @@
 			},
 			{
 				"name": "ExistsCheck",
+				"description": "取込既存チェック",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "DupeCheck",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 4\n  FROM tmp_odbms_stock_info AS tmp\n INNER JOIN odbms_stock_info AS inf\n    ON inf.store_cd = tmp.store_cd\n   AND inf.jan_cd = tmp.jan_cd\n WHERE tmp.validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "DupeCheck",
+				"description": "重複チェック",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -401,7 +437,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 3\n  FROM tmp_odbms_stock_info AS tmp\n INNER JOIN odbms_stock_info AS inf\n    ON inf.store_cd = tmp.store_cd\n   AND inf.jan_cd = tmp.jan_cd\n WHERE tmp.validation_cd = 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_odbms_stock_info SET validation_cd = 3\n  FROM tmp_odbms_stock_info AS tmp\n WHERE tmp.seq_no = (\n        SELECT seq_no\n          FROM (\n            SELECT seq_no, store_cd, jan_cd, ROW_NUMBER() OVER(PARTITION BY store_cd,jan_cd ORDER BY seq_no asc) AS row_no\n              FROM tmp_odbms_stock_info\n             WHERE validation_cd = 1\n        ) AS dupe\n        WHERE row_no = 1\n);\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},

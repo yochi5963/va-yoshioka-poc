@@ -197,6 +197,7 @@
 			},
 			{
 				"name": "ValidationCheck",
+				"description": "バリデーションチェック",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -378,6 +379,7 @@
 			},
 			{
 				"name": "ValidationLog",
+				"description": "バリデーションログ",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
