@@ -195,7 +195,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n    'INSERT INTO odbms_mini_info (',\n    '    calc_date, store_cd, jan_cd,',\n    '    term_mini, dept_cd, env_id',\n    ') ',\n    ' SELECT',\n    '    calc_date,',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    term_mini,',\n    '    dept_cd,',\n    '    ''', pipeline().parameters.in_target, '''',\n    ' FROM tmp_odbms_mini_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
+							"value": "@concat(\n    'INSERT INTO odbms_mini_info (',\n    '    store_cd, jan_cd,　threshold_num, env_id',\n    ') ',\n    ' SELECT',\n    '    RIGHT(''00000'' + store_cd, 5),',\n    '    RIGHT(''0000000000000'' + jan_cd, 13),',\n    '    threshold_num,',\n    '    ''', pipeline().parameters.in_target, '''',\n    ' FROM tmp_odbms_mini_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
