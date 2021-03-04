@@ -63,6 +63,12 @@
 				"typeProperties": {
 					"source": {
 						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "file_path",
+								"value": "$$FILEPATH"
+							}
+						],
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
@@ -86,6 +92,17 @@
 						"mappings": [
 							{
 								"source": {
+									"name": "file_path",
+									"type": "String"
+								},
+								"sink": {
+									"name": "file_path",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
 									"type": "String",
 									"physicalType": "String",
 									"ordinal": 1
@@ -104,8 +121,8 @@
 								},
 								"sink": {
 									"name": "jan_cd",
-									"type": "Int64",
-									"physicalType": "bigint"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							}
 						],
