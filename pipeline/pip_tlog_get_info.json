@@ -54,7 +54,14 @@
 				"name": "ImportCsv",
 				"description": "CSVファイルをインポート",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "MoveWorkFolder",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "01:00:00",
 					"retry": 0,
@@ -77,7 +84,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/breakset",
 							"wildcardFileName": {
-								"value": "*_breakset.csv",
+								"value": "*_sales.csv*",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -441,11 +448,12 @@
 				}
 			},
 			{
-				"name": "Copy Daily",
+				"name": "MoveWorkFolder",
+				"description": "作業用フォルダへ移動",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "00:00:10",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -453,17 +461,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"fileListPath": "vstockpoc/appdata/ftpdata/eai/in/sales",
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
 					"sink": {
 						"type": "BinarySink",
 						"storeSettings": {
@@ -472,12 +469,6 @@
 					},
 					"enableStaging": false
 				},
-				"inputs": [
-					{
-						"referenceName": "dst_blob_result",
-						"type": "DatasetReference"
-					}
-				],
 				"outputs": [
 					{
 						"referenceName": "daily_folder",
