@@ -69,9 +69,9 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/brakeset",
+							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/breakset",
 							"wildcardFileName": {
-								"value": "*_brakeset.csv",
+								"value": "*_breakset.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
