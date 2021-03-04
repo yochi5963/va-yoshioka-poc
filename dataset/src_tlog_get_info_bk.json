@@ -1,0 +1,26 @@
+{
+	"name": "src_tlog_get_info_bk",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "appdata/ftpdata/eai/in/sales/bk",
+				"container": "vstockpoc"
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "gzip",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
