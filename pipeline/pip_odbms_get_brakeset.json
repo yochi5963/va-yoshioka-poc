@@ -1,5 +1,5 @@
 {
-	"name": "pip_odbms_get_breakset",
+	"name": "pip_odbms_get_brakeset",
 	"properties": {
 		"activities": [
 			{
@@ -69,9 +69,9 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/breakset",
+							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/brakeset",
 							"wildcardFileName": {
-								"value": "*_breakset.csv",
+								"value": "*_brakeset.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -81,9 +81,7 @@
 						}
 					},
 					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE odbms_brakeset_info;\nTRUNCATE TABLE tmp_odbms_brakeset_info;",
-						"disableMetricsCollection": false
+						"type": "AzureSqlSink"
 					},
 					"enableStaging": false,
 					"translator": {
@@ -160,7 +158,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "tmp_odbms_breakset_info",
+						"referenceName": "tmp_odbms_brakeset_info",
 						"type": "DatasetReference"
 					}
 				]
@@ -188,7 +186,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_breakset_info SET validation_cd = 2\n WHERE env_id IS NULL\n    OR parent_dept_cd IS NULL\n    OR child_jan_cd IS NULL\n    OR LEN(env_id) > 4\n    OR LEN(parent_dept_cd) > 3\n    OR LEN(parent_jan_cd) > 13\n    OR LEN(child_dept_cd) > 3\n    OR LEN(child_jan_cd) > 13\n    OR ISNUMERIC(number_sets) <> 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_odbms_brakeset_info SET validation_cd = 2\n WHERE env_id IS NULL\n    OR parent_dept_cd IS NULL\n    OR child_jan_cd IS NULL\n    OR LEN(env_id) > 4\n    OR LEN(parent_dept_cd) > 3\n    OR LEN(parent_jan_cd) > 13\n    OR LEN(child_dept_cd) > 3\n    OR LEN(child_jan_cd) > 13\n    OR ISNUMERIC(number_sets) <> 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -222,7 +220,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n    'INSERT INTO odbms_breakset_info (',\n    '    env_id ,parent_dept_cd ,parent_jan_cd ,child_dept_cd ,child_jan_cd ,number_sets',\n    ') ',\n    ' SELECT',\n    '    env_id,',\n    '    parent_dept_cd,',\n    '    RIGHT(''0000000000000'' + parent_jan_cd, 13),',\n    '    child_dept_cd,',\n    '    RIGHT(''0000000000000'' + child_jan_cd, 13),',\n    '    number_sets',\n    ' FROM tmp_odbms_breakset_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
+							"value": "@concat(\n    'INSERT INTO odbms_brakeset_info (',\n    '    env_id ,parent_dept_cd ,parent_jan_cd ,child_dept_cd ,child_jan_cd ,number_sets',\n    ') ',\n    ' SELECT',\n    '    env_id,',\n    '    parent_dept_cd,',\n    '    RIGHT(''0000000000000'' + parent_jan_cd, 13),',\n    '    child_dept_cd,',\n    '    RIGHT(''0000000000000'' + child_jan_cd, 13),',\n    '    number_sets',\n    ' FROM tmp_odbms_brakeset_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -381,7 +379,7 @@
 							"type": "String"
 						},
 						"vc_tmp_table": {
-							"value": "tmp_odbms_breakset_info",
+							"value": "tmp_odbms_brakeset_info",
 							"type": "String"
 						}
 					}
@@ -414,7 +412,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_breakset_info SET validation_cd = 3\n  FROM tmp_odbms_breakset_info AS tmp\n WHERE tmp.seq_no IN (\n        SELECT seq_no\n          FROM (\n            SELECT seq_no, ROW_NUMBER() OVER(PARTITION BY child_jan_cd ORDER BY seq_no asc) AS row_no\n              FROM tmp_odbms_breakset_info\n             WHERE validation_cd = 1\n        ) AS dupe\n        WHERE row_no <> 1\n);\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_odbms_brakeset_info SET validation_cd = 3\n  FROM tmp_odbms_brakeset_info AS tmp\n WHERE tmp.seq_no IN (\n        SELECT seq_no\n          FROM (\n            SELECT seq_no, ROW_NUMBER() OVER(PARTITION BY child_jan_cd ORDER BY seq_no asc) AS row_no\n              FROM tmp_odbms_brakeset_info\n             WHERE validation_cd = 1\n        ) AS dupe\n        WHERE row_no <> 1\n);\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
