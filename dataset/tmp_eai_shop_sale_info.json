@@ -1,0 +1,19 @@
+{
+	"name": "tmp_eai_shop_sale_info",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_stock_sql",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tmp_eai_shop_sale_info"
+		}
+	}
+}
