@@ -81,7 +81,9 @@
 						}
 					},
 					"sink": {
-						"type": "AzureSqlSink"
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE odbms_brakeset_info;\nTRUNCATE TABLE tmp_odbms_brakeset_info;\n",
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
