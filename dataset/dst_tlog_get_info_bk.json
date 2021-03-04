@@ -1,0 +1,25 @@
+{
+	"name": "dst_tlog_get_info_bk",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "test01_link_blob",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "appdata/ftpdata/eai/in/sales",
+				"container": "vstockpoc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
