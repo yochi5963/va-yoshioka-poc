@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "appdata/ftpdata/eai/in/sales",
+				"folderPath": "appdata/ftpdata/eai/in/sales/bk",
 				"container": "vstockpoc"
 			},
 			"columnDelimiter": ",",
