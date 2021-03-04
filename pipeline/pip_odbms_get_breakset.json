@@ -1,0 +1,445 @@
+{
+	"name": "pip_odbms_get_breakset",
+	"properties": {
+		"activities": [
+			{
+				"name": "ImportError1",
+				"description": "取込異常終了",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
+					"storedProcedureParameters": {
+						"vc_error_mode": {
+							"value": {
+								"value": "@pipeline().parameters.in_error_mode",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_exec_na": {
+							"value": {
+								"value": "odbms_brakeset_in",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_log_text": {
+							"value": "CSVファイルが存在しません。",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ImportCsv",
+				"description": "CSVファイルをインポート",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/breakset",
+							"wildcardFileName": {
+								"value": "*_breakset.csv",
+								"type": "Expression"
+							},
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE odbms_brakeset_info;\nTRUNCATE TABLE tmp_odbms_brakeset_info;",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 1
+								},
+								"sink": {
+									"name": "env_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 2
+								},
+								"sink": {
+									"name": "parent_dept_cd",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 3
+								},
+								"sink": {
+									"name": "parent_jan_cd",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 4
+								},
+								"sink": {
+									"name": "child_dept_cd",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 5
+								},
+								"sink": {
+									"name": "child_jan_cd",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 6
+								},
+								"sink": {
+									"name": "number_sets",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "src_blob_pattern_csv",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "tmp_odbms_breakset_info",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "ValidationCheck",
+				"description": "バリデーションチェック",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "UPDATE tmp_odbms_breakset_info SET validation_cd = 2\n WHERE env_id IS NULL\n    OR parent_dept_cd IS NULL\n    OR child_jan_cd IS NULL\n    OR LEN(env_id) > 4\n    OR LEN(parent_dept_cd) > 3\n    OR LEN(parent_jan_cd) > 13\n    OR LEN(child_dept_cd) > 3\n    OR LEN(child_jan_cd) > 13\n    OR ISNUMERIC(number_sets) <> 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ImportTmp",
+				"description": "一時テーブルをインポート",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ValidationLog",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat(\n    'INSERT INTO odbms_breakset_info (',\n    '    env_id ,parent_dept_cd ,parent_jan_cd ,child_dept_cd ,child_jan_cd ,number_sets',\n    ') ',\n    ' SELECT',\n    '    env_id,',\n    '    parent_dept_cd,',\n    '    RIGHT(''0000000000000'' + parent_jan_cd, 13),',\n    '    child_dept_cd,',\n    '    RIGHT(''0000000000000'' + child_jan_cd, 13),',\n    '    number_sets',\n    ' FROM tmp_odbms_breakset_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "SetRowsRead",
+				"description": "読込行数取得",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ImportCsv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "rowsRead",
+					"value": {
+						"value": "@concat(activity('ImportCsv').output. rowsRead)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "IfRowsRead",
+				"description": "CSV読込行数により分岐",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "ImportTmp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('rowsRead'),'0')\n\n",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Complete",
+							"description": "正常終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[marge_normal_exec_rslt_info]",
+								"storedProcedureParameters": {
+									"vc_exec_na": {
+										"value": {
+											"value": "odbms_brakeset_in",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "ImportError2",
+							"description": "取込異常終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[marge_error_exec_rslt_info_adf]",
+								"storedProcedureParameters": {
+									"vc_error_mode": {
+										"value": {
+											"value": "@pipeline().parameters.in_error_mode",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"vc_exec_na": {
+										"value": {
+											"value": "odbms_brakeset_in",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"vc_log_text": {
+										"value": "CSVファイルが空か、存在しません。",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ValidationLog",
+				"description": "バリデーションログ",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "DupeCheck",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[insert_validation_log]",
+					"storedProcedureParameters": {
+						"vc_exec_na": {
+							"value": {
+								"value": "odbms_brakeset_in",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"vc_tmp_table": {
+							"value": "tmp_odbms_breakset_info",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "lnk_stock_sql",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "DupeCheck",
+				"description": "重複チェック",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ValidationCheck",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "UPDATE tmp_odbms_breakset_info SET validation_cd = 3\n  FROM tmp_odbms_breakset_info AS tmp\n WHERE tmp.seq_no IN (\n        SELECT seq_no\n          FROM (\n            SELECT seq_no, ROW_NUMBER() OVER(PARTITION BY child_jan_cd ORDER BY seq_no asc) AS row_no\n              FROM tmp_odbms_breakset_info\n             WHERE validation_cd = 1\n        ) AS dupe\n        WHERE row_no <> 1\n);\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"concurrency": 1,
+		"parameters": {
+			"in_error_mode": {
+				"type": "string",
+				"defaultValue": "2"
+			}
+		},
+		"variables": {
+			"rowsRead": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": []
+	}
+}
