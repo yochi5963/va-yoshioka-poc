@@ -1,5 +1,5 @@
 {
-	"name": "tmp_odbms_breakset_info",
+	"name": "tmp_odbms_brakeset_info",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "lnk_stock_sql",
