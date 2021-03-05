@@ -82,9 +82,9 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "appdata/ftpdata/eai/odbms/in/breakset",
+							"wildcardFolderPath": "appdata/ftpdata/eai/in/sales/wk",
 							"wildcardFileName": {
-								"value": "*_sales.csv*",
+								"value": "*_sales.csv.gz",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -95,7 +95,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE odbms_brakeset_info;\nTRUNCATE TABLE tmp_odbms_brakeset_info;\n",
+						"preCopyScript": "DELETE FROM eai_shop_sale_info WHERE selling_date < CONVERT(NVARCHAR, DATEADD(MONTH, -1, GETDATE()), 112);\nTRUNCATE TABLE tmp_eai_shop_sale_info;",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -103,42 +103,8 @@
 						"type": "TabularTranslator",
 						"mappings": [
 							{
-								"source": {
-									"name": "filepath",
-									"type": "String"
-								},
 								"sink": {
 									"name": "file_path",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 1
-								},
-								"sink": {
-									"name": "env_id",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 2
-								},
-								"sink": {
-									"name": "parent_dept_cd",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 3
-								},
-								"sink": {
-									"name": "parent_jan_cd",
 									"type": "String"
 								}
 							},
@@ -148,7 +114,7 @@
 									"ordinal": 4
 								},
 								"sink": {
-									"name": "child_dept_cd",
+									"name": "shop_cd",
 									"type": "String"
 								}
 							},
@@ -158,7 +124,7 @@
 									"ordinal": 5
 								},
 								"sink": {
-									"name": "child_jan_cd",
+									"name": "dept_cd",
 									"type": "String"
 								}
 							},
@@ -168,7 +134,37 @@
 									"ordinal": 6
 								},
 								"sink": {
-									"name": "number_sets",
+									"name": "jan_cd",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 7
+								},
+								"sink": {
+									"name": "selling_date",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 8
+								},
+								"sink": {
+									"name": "selling_cnt",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 9
+								},
+								"sink": {
+									"name": "store_cd",
 									"type": "String"
 								}
 							}
@@ -177,13 +173,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "src_blob_pattern_csv",
+						"referenceName": "src_blob_pattern_gz",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "tmp_odbms_brakeset_info",
+						"referenceName": "tmp_eai_shop_sale_info",
 						"type": "DatasetReference"
 					}
 				]

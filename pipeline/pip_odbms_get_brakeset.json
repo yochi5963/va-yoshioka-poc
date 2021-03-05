@@ -97,7 +97,7 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "filepath",
+									"name": "file_path",
 									"type": "String"
 								},
 								"sink": {
