@@ -34,7 +34,7 @@
 						},
 						"vc_exec_na": {
 							"value": {
-								"value": "odbms_brakeset_in",
+								"value": "eai_tlog_in",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -75,7 +75,7 @@
 						"type": "DelimitedTextSource",
 						"additionalColumns": [
 							{
-								"name": "filepath",
+								"name": "file_path",
 								"value": "$$FILEPATH"
 							}
 						],
@@ -103,6 +103,10 @@
 						"type": "TabularTranslator",
 						"mappings": [
 							{
+								"source": {
+									"name": "file_path",
+									"type": "String"
+								},
 								"sink": {
 									"name": "file_path",
 									"type": "String"
@@ -111,7 +115,7 @@
 							{
 								"source": {
 									"type": "String",
-									"ordinal": 4
+									"ordinal": 1
 								},
 								"sink": {
 									"name": "shop_cd",
@@ -121,7 +125,7 @@
 							{
 								"source": {
 									"type": "String",
-									"ordinal": 5
+									"ordinal": 3
 								},
 								"sink": {
 									"name": "dept_cd",
@@ -131,7 +135,7 @@
 							{
 								"source": {
 									"type": "String",
-									"ordinal": 6
+									"ordinal": 4
 								},
 								"sink": {
 									"name": "jan_cd",
@@ -141,7 +145,7 @@
 							{
 								"source": {
 									"type": "String",
-									"ordinal": 7
+									"ordinal": 2
 								},
 								"sink": {
 									"name": "selling_date",
@@ -151,20 +155,10 @@
 							{
 								"source": {
 									"type": "String",
-									"ordinal": 8
+									"ordinal": 6
 								},
 								"sink": {
 									"name": "selling_cnt",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 9
-								},
-								"sink": {
-									"name": "store_cd",
 									"type": "String"
 								}
 							}
@@ -207,7 +201,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_brakeset_info SET validation_cd = 2\n WHERE env_id IS NULL\n    OR parent_dept_cd IS NULL\n    OR child_jan_cd IS NULL\n    OR LEN(env_id) > 4\n    OR LEN(parent_dept_cd) > 3\n    OR LEN(parent_jan_cd) > 13\n    OR LEN(child_dept_cd) > 3\n    OR LEN(child_jan_cd) > 13\n    OR ISNUMERIC(number_sets) <> 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_eai_shop_sale_info SET validation_cd = 2\n WHERE shop_cd IS NULL\n    OR jan_cd IS NULL\n    OR selling_date IS NULL\n    OR LEN(shop_cd) <> 10\n    OR LEN(jan_cd) > 13\n    OR ISNUMERIC(selling_cnt) <> 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -241,7 +235,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n    'INSERT INTO odbms_brakeset_info (',\n    '    env_id ,parent_dept_cd ,parent_jan_cd ,child_dept_cd ,child_jan_cd ,number_sets',\n    ') ',\n    ' SELECT',\n    '    env_id,',\n    '    parent_dept_cd,',\n    '    RIGHT(''0000000000000'' + parent_jan_cd, 13),',\n    '    child_dept_cd,',\n    '    RIGHT(''0000000000000'' + child_jan_cd, 13),',\n    '    CONVERT(INT, CONVERT(DECIMAL, number_sets))',\n    ' FROM tmp_odbms_brakeset_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
+							"value": "@concat(\n    'INSERT INTO eai_shop_sale_info (',\n    '    env_id ,parent_dept_cd ,parent_jan_cd ,child_dept_cd ,child_jan_cd ,number_sets',\n    ') ',\n    ' SELECT',\n    '    env_id,',\n    '    parent_dept_cd,',\n    '    RIGHT(''0000000000000'' + parent_jan_cd, 13),',\n    '    child_dept_cd,',\n    '    RIGHT(''0000000000000'' + child_jan_cd, 13),',\n    '    CONVERT(INT, CONVERT(DECIMAL, number_sets))',\n    ' FROM tmp_eai_shop_sale_info',\n    ' WHERE validation_cd = 1;',\n    ' SELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;'\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -311,7 +305,7 @@
 								"storedProcedureParameters": {
 									"vc_exec_na": {
 										"value": {
-											"value": "odbms_brakeset_in",
+											"value": "eai_tlog_in",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -350,7 +344,7 @@
 									},
 									"vc_exec_na": {
 										"value": {
-											"value": "odbms_brakeset_in",
+											"value": "eai_tlog_in",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -375,7 +369,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "DupeCheck",
+						"activity": "ValidationCheck",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -394,13 +388,13 @@
 					"storedProcedureParameters": {
 						"vc_exec_na": {
 							"value": {
-								"value": "odbms_brakeset_in",
+								"value": "eai_tlog_in",
 								"type": "Expression"
 							},
 							"type": "String"
 						},
 						"vc_tmp_table": {
-							"value": "tmp_odbms_brakeset_info",
+							"value": "tmp_eai_shop_sale_info",
 							"type": "String"
 						}
 					}
@@ -408,39 +402,6 @@
 				"linkedServiceName": {
 					"referenceName": "lnk_stock_sql",
 					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "DupeCheck",
-				"description": "重複チェック",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ValidationCheck",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "1:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_odbms_brakeset_info SET validation_cd = 3\n  FROM tmp_odbms_brakeset_info AS tmp\n WHERE tmp.seq_no IN (\n        SELECT seq_no\n          FROM (\n            SELECT seq_no, ROW_NUMBER() OVER(PARTITION BY child_jan_cd ORDER BY seq_no asc) AS row_no\n              FROM tmp_odbms_brakeset_info\n             WHERE validation_cd = 1\n        ) AS dupe\n        WHERE row_no <> 1\n);\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "dst_sql_none",
-						"type": "DatasetReference"
-					}
 				}
 			},
 			{
@@ -485,6 +446,59 @@
 				"outputs": [
 					{
 						"referenceName": "src_tlog_get_info_wk",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "MoveBackFolder",
+				"description": "バックアップフォルダへ移動",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportTmp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "00:00:10",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"deleteFilesAfterCompletion": true
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "src_tlog_get_info_wk",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "src_tlog_get_info_bk",
 						"type": "DatasetReference"
 					}
 				]
