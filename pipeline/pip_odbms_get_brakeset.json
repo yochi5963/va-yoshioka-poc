@@ -68,7 +68,7 @@
 						"type": "DelimitedTextSource",
 						"additionalColumns": [
 							{
-								"name": "filepath",
+								"name": "file_path",
 								"value": "$$FILEPATH"
 							}
 						],
