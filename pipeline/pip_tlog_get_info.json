@@ -502,6 +502,27 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "csv_nakutemo_error_ni_sinai",
+				"description": "CSVファイルなくてもエラーしない。\nImportErr1不要。\nSetRowsRead不要\n最後のIFも不要",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
 			}
 		],
 		"concurrency": 1,
