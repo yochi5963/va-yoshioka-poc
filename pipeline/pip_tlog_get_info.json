@@ -428,17 +428,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DelimitedTextSource",
+						"type": "BinarySource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
+							"recursive": true
 						},
 						"formatSettings": {
-							"type": "DelimitedTextReadSettings",
-							"compressionProperties": {
-								"type": "ZipDeflateReadSettings"
-							}
+							"type": "BinaryReadSettings"
 						}
 					},
 					"sink": {
@@ -456,7 +452,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "src_tlog_get_info",
+						"referenceName": "src_tlog_get_info_GOMI",
 						"type": "DatasetReference"
 					}
 				],
