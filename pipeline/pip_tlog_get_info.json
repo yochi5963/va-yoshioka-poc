@@ -201,7 +201,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "UPDATE tmp_eai_shop_sale_info SET validation_cd = 2\n WHERE shop_cd IS NULL\n    OR jan_cd IS NULL\n    OR selling_date IS NULL\n    OR LEN(shop_cd) <> 10\n    OR LEN(selling_date) <> 8\n    OR LEN(jan_cd) > 13\n    OR ISNUMERIC(selling_cnt) <> 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
+						"sqlReaderQuery": "UPDATE tmp_eai_shop_sale_info SET validation_cd = 2\n WHERE shop_cd IS NULL\n    OR jan_cd IS NULL\n    OR selling_date IS NULL\n    OR LEN(shop_cd) <> 10\n    OR LEN(selling_date) <> 8\n    OR LEN(jan_cd) > 13\n    OR LEN(dept_cd) > 3\n    OR ISNUMERIC(selling_cnt) <> 1;\nSELECT @@ROWCOUNT as count, CURRENT_TIMESTAMP as updt_dt;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
