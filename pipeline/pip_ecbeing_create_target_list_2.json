@@ -95,7 +95,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pip_ecbeing_create_target_list_3_BULK",
+									"referenceName": "pip_ecbeing_create_target_list_3",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
