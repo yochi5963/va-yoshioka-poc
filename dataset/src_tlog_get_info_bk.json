@@ -13,12 +13,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "intac_judge_info.zip",
-				"folderPath": "input",
+				"folderPath": "appdata/ftpdata/eai/in/sales/wk",
 				"container": "vstockpoc"
 			},
 			"columnDelimiter": ",",
-			"compressionCodec": "ZipDeflate",
 			"escapeChar": "\\",
 			"quoteChar": "\""
 		},
