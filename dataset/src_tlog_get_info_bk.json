@@ -1,5 +1,5 @@
 {
-	"name": "dst_tlog_get_info_bk",
+	"name": "src_tlog_get_info_bk",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "test01_link_blob",
