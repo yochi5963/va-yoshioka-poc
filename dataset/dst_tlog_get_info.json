@@ -1,5 +1,5 @@
 {
-	"name": "src_tlog_get_info_GOMI",
+	"name": "dst_tlog_get_info",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "test01_link_blob",
