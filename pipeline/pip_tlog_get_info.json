@@ -419,7 +419,8 @@
 						"type": "BinarySource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
-							"recursive": true
+							"recursive": false,
+							"deleteFilesAfterCompletion": true
 						},
 						"formatSettings": {
 							"type": "BinaryReadSettings"
@@ -471,7 +472,8 @@
 						"type": "BinarySource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
-							"recursive": true
+							"recursive": false,
+							"deleteFilesAfterCompletion": true
 						},
 						"formatSettings": {
 							"type": "BinaryReadSettings"
@@ -516,7 +518,8 @@
 						"type": "BinarySource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
-							"recursive": true
+							"recursive": false,
+							"deleteFilesAfterCompletion": false
 						},
 						"formatSettings": {
 							"type": "BinaryReadSettings"
