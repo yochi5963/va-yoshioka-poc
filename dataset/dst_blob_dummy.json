@@ -1,5 +1,5 @@
 {
-	"name": "dst_tlog_get_info_bk",
+	"name": "dst_blob_dummy",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "test01_link_blob",
@@ -13,7 +13,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "appdata/ftpdata/eai/in/sales/bk",
+				"fileName": "dummy.txt",
+				"folderPath": "appdata/template",
 				"container": "vstockpoc"
 			}
 		}
