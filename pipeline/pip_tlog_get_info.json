@@ -511,6 +511,7 @@
 			},
 			{
 				"name": "CopyDummy",
+				"description": "フォルダ無しエラー回避のためダミーファイルをコピー",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
