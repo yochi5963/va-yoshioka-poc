@@ -334,6 +334,9 @@
 				"defaultValue": "2"
 			}
 		},
+		"folder": {
+			"name": "stock"
+		},
 		"annotations": []
 	}
 }
