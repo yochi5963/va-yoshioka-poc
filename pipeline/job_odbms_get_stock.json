@@ -1,0 +1,342 @@
+{
+	"name": "job_odbms_get_stock",
+	"properties": {
+		"description": "バッチ実行結果を参照し自JOBが当日正常終了していなければ処理続行",
+		"activities": [
+			{
+				"name": "GetJobStatusGM",
+				"description": "本日のバッチ実行結果を参照",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_stock_gm_in_rslt_cd = '1'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "CheckJobStatusGM",
+				"description": "本日のバッチ実行結果をチェック",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetJobStatusGM",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(\n  equals(\n    activity('GetJobStatusGM').output.firstRow.cnt,\n    1\n  )\n)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "CancelPipelineGM",
+							"description": "処理終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+								"storedProcedureParameters": {
+									"vc_exec_na": {
+										"value": "odbms_stock_gm_in",
+										"type": "String"
+									},
+									"vc_log_text": {
+										"value": "実施済であるため、パイプライン処理を起動しません。",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "NextPipelineGM",
+							"description": "後続処理呼出",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pip_odbms_get_stock",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"in_error_mode": {
+										"value": "@pipeline().parameters.in_error_mode",
+										"type": "Expression"
+									},
+									"in_target": "GM",
+									"in_exec_na": "odbms_stock_gm_in"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "GetJobStatusGR",
+				"description": "本日のバッチ実行結果を参照",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CheckJobStatusGM",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_stock_gr_in_rslt_cd = '1'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "CheckJobStatusGR",
+				"description": "本日のバッチ実行結果をチェック",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetJobStatusGR",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(\n  equals(\n    activity('GetJobStatusGR').output.firstRow.cnt,\n    1\n  )\n)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "CancelPipelineGR",
+							"description": "処理終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+								"storedProcedureParameters": {
+									"vc_exec_na": {
+										"value": "odbms_stock_gr_in",
+										"type": "String"
+									},
+									"vc_log_text": {
+										"value": "実施済であるため、パイプライン処理を起動しません。",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "NextPipelineGR",
+							"description": "後続処理呼出",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pip_odbms_get_stock",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"in_error_mode": {
+										"value": "@pipeline().parameters.in_error_mode",
+										"type": "Expression"
+									},
+									"in_target": "GR",
+									"in_exec_na": "odbms_stock_gr_in"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "GetJobStatusMD",
+				"description": "本日のバッチ実行結果を参照",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CheckJobStatusGR",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:01:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_stock_md_in_rslt_cd = '1'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dst_sql_none",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "CheckJobStatusMD",
+				"description": "本日のバッチ実行結果をチェック",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetJobStatusMD",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(\n  equals(\n    activity('GetJobStatusMD').output.firstRow.cnt,\n    1\n  )\n)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "CancelPipelineMD",
+							"description": "処理終了",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "00:01:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
+								"storedProcedureParameters": {
+									"vc_exec_na": {
+										"value": "odbms_stock_md_in",
+										"type": "String"
+									},
+									"vc_log_text": {
+										"value": "実施済であるため、パイプライン処理を起動しません。",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "lnk_stock_sql",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "NextPipelineMD",
+							"description": "後続処理呼出",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pip_odbms_get_stock",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"in_error_mode": {
+										"value": "@pipeline().parameters.in_error_mode",
+										"type": "Expression"
+									},
+									"in_target": "MD",
+									"in_exec_na": "odbms_stock_md_in"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"concurrency": 1,
+		"parameters": {
+			"in_error_mode": {
+				"type": "string",
+				"defaultValue": "2"
+			}
+		},
+		"folder": {
+			"name": "stock"
+		},
+		"annotations": []
+	}
+}
