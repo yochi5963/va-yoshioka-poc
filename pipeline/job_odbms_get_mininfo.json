@@ -1,10 +1,10 @@
 {
-	"name": "pip_ecbeing_create_target_list_1",
+	"name": "job_odbms_get_mininfo",
 	"properties": {
 		"description": "バッチ実行結果を参照し自JOBが当日正常終了していなければ処理続行",
 		"activities": [
 			{
-				"name": "GetJobStatus",
+				"name": "GetJobStatusGM",
 				"description": "本日のバッチ実行結果を参照",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -19,7 +19,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND ecbeing_goods_in_rslt_cd  = '1'",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_mini_gm_in_rslt_cd = '1'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -30,12 +30,12 @@
 				}
 			},
 			{
-				"name": "CheckJobStatus",
+				"name": "CheckJobStatusGM",
 				"description": "本日のバッチ実行結果をチェック",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "GetJobStatus",
+						"activity": "GetJobStatusGM",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -65,7 +65,7 @@
 								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
 								"storedProcedureParameters": {
 									"vc_exec_na": {
-										"value": "ecbeing_goods_in",
+										"value": "odbms_mini_gm_in",
 										"type": "String"
 									},
 									"vc_log_text": {
@@ -108,8 +108,7 @@
 		"concurrency": 1,
 		"parameters": {
 			"in_error_mode": {
-				"type": "string",
-				"defaultValue": "2"
+				"type": "string"
 			}
 		},
 		"folder": {
