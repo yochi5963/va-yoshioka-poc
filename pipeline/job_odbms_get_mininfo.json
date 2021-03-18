@@ -44,12 +44,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@not(\n  equals(\n    activity('GetJobStatus').output.firstRow.cnt,\n    1\n  )\n)",
+						"value": "@not(\n  equals(\n    activity('GetJobStatusGM').output.firstRow.cnt,\n    1\n  )\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
 						{
-							"name": "cancel_pipeline",
+							"name": "CancelPipelineGM",
 							"description": "処理終了",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
@@ -69,7 +69,7 @@
 										"type": "String"
 									},
 									"vc_log_text": {
-										"value": "実施済であるため、ストアド処理を起動しません。",
+										"value": "実施済であるため、パイプライン処理を起動しません。",
 										"type": "String"
 									}
 								}
@@ -82,14 +82,14 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "next_pipeline",
+							"name": "NextPipelineGm",
 							"description": "後続処理呼出",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pip_ecbeing_create_target_list_2",
+									"referenceName": "pip_odbms_get_minInfo",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -97,7 +97,9 @@
 									"in_error_mode": {
 										"value": "@pipeline().parameters.in_error_mode",
 										"type": "Expression"
-									}
+									},
+									"in_target": "GM",
+									"in_exec_na": "odbms_mini_gm_in"
 								}
 							}
 						}
@@ -108,11 +110,9 @@
 		"concurrency": 1,
 		"parameters": {
 			"in_error_mode": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "2"
 			}
-		},
-		"folder": {
-			"name": "stock"
 		},
 		"annotations": []
 	}
