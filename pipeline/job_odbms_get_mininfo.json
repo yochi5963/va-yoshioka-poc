@@ -154,7 +154,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@not(\n  equals(\n    activity('GetJobStatusGM').output.firstRow.cnt,\n    1\n  )\n)",
+						"value": "@not(\n  equals(\n    activity('GetJobStatusGR').output.firstRow.cnt,\n    1\n  )\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -264,7 +264,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@not(\n  equals(\n    activity('GetJobStatusGM').output.firstRow.cnt,\n    1\n  )\n)",
+						"value": "@not(\n  equals(\n    activity('GetJobStatusMD').output.firstRow.cnt,\n    1\n  )\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
