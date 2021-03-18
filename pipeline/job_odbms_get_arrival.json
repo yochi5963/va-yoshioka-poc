@@ -19,7 +19,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_mini_gm_in_rslt_cd = '1'",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_gm_in_rslt_cd = '1'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -65,7 +65,7 @@
 								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
 								"storedProcedureParameters": {
 									"vc_exec_na": {
-										"value": "odbms_mini_gm_in",
+										"value": "odbms_arriv_gm_in",
 										"type": "String"
 									},
 									"vc_log_text": {
@@ -89,7 +89,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pip_odbms_get_minInfo",
+									"referenceName": "pip_odbms_get_arrival",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -99,7 +99,7 @@
 										"type": "Expression"
 									},
 									"in_target": "GM",
-									"in_exec_na": "odbms_mini_gm_in"
+									"in_exec_na": "odbms_arriv_gm_in"
 								}
 							}
 						}
@@ -129,7 +129,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_mini_gr_in_rslt_cd = '1'",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_gr_in_rslt_cd = '1'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -175,7 +175,7 @@
 								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
 								"storedProcedureParameters": {
 									"vc_exec_na": {
-										"value": "odbms_mini_gr_in",
+										"value": "odbms_arriv_gr_in",
 										"type": "String"
 									},
 									"vc_log_text": {
@@ -199,7 +199,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pip_odbms_get_minInfo",
+									"referenceName": "pip_odbms_get_arrival",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -209,7 +209,7 @@
 										"type": "Expression"
 									},
 									"in_target": "GR",
-									"in_exec_na": "odbms_mini_gr_in"
+									"in_exec_na": "odbms_arriv_gr_in"
 								}
 							}
 						}
@@ -239,7 +239,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_mini_md_in_rslt_cd = '1'",
+						"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_md_in_rslt_cd = '1'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -285,7 +285,7 @@
 								"storedProcedureName": "[dbo].[insert_normal_exec_log]",
 								"storedProcedureParameters": {
 									"vc_exec_na": {
-										"value": "odbms_mini_md_in",
+										"value": "odbms_arriv_md_in",
 										"type": "String"
 									},
 									"vc_log_text": {
@@ -309,7 +309,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pip_odbms_get_minInfo",
+									"referenceName": "pip_odbms_get_arrival",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -319,7 +319,7 @@
 										"type": "Expression"
 									},
 									"in_target": "MD",
-									"in_exec_na": "odbms_mini_md_in"
+									"in_exec_na": "odbms_arriv_md_in"
 								}
 							}
 						}
