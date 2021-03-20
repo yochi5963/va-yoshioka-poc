@@ -35,6 +35,22 @@
 			"type": "string",
 			"defaultValue": "1"
 		},
+		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
+			"type": "string",
+			"defaultValue": "2"
+		},
+		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
+			"type": "string",
+			"defaultValue": "GM"
+		},
+		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
+			"type": "string",
+			"defaultValue": "odbms_arriv_gm_in"
+		},
+		"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "リンクされた ARM テンプレートを含むストレージ アカウントの URI"
@@ -154,9 +170,61 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_3')]"
+			]
+		},
+		{
+			"name": "va-yoshioka-poc_ArmTemplate_5",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_5.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_4')]"
+			]
+		},
+		{
+			"name": "va-yoshioka-poc_ArmTemplate_6",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_6.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
 					},
 					"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 						"value": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]"
+					},
+					"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
+						"value": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode')]"
+					},
+					"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
+						"value": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target')]"
+					},
+					"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
+						"value": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na')]"
+					},
+					"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
+						"value": "[parameters('trg_odbms_get_arrival_GM_properties_typeProperties_scope')]"
 					},
 					"trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode": {
 						"value": "[parameters('trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode')]"
@@ -164,7 +232,7 @@
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_3')]"
+				"[resourceId('Microsoft.Resources/deployments', 'va-yoshioka-poc_ArmTemplate_5')]"
 			]
 		}
 	]

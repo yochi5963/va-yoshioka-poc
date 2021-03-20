@@ -223,6 +223,31 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/dst_blob_dummy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "dummy.txt",
+						"folderPath": "appdata/template",
+						"container": "vstockpoc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dst_blob_result')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -252,56 +277,121 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dst_ecbeing_goods_tmp')]",
+			"name": "[concat(parameters('factoryName'), '/dst_intactix_get_info')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "lnk_stock_sql",
+					"referenceName": "test01_link_blob",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
 					"name": "stock"
 				},
 				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "company_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "shop_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "dept_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "category_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sub_category_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "jan_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sales_promotion_cd",
-						"type": "nchar"
-					},
-					{
-						"name": "disp_status_cd",
-						"type": "nchar"
-					}
-				],
+				"type": "Binary",
 				"typeProperties": {
-					"schema": "dbo",
-					"table": "ecbeing_goods_tmp"
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/intactix/in/planogram",
+						"container": "vstockpoc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dst_odbms_get_arrival')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/odbms/in/order",
+						"container": "vstockpoc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dst_odbms_get_brakeset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/odbms/in/breakset",
+						"container": "vstockpoc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dst_odbms_get_minInfo')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/odbms/in/mini",
+						"container": "vstockpoc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dst_odbms_get_stock')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/odbms/in/stock",
+						"container": "vstockpoc"
+					}
 				}
 			},
 			"dependsOn": []
@@ -322,6 +412,78 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dst_tlog_get_info')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/in/sales",
+						"container": "vstockpoc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dst_tlog_get_info_bk')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/in/sales/bk",
+						"container": "vstockpoc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dst_tlog_get_info_wk')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "appdata/ftpdata/eai/in/sales/wk",
+						"container": "vstockpoc"
+					}
+				}
 			},
 			"dependsOn": []
 		},
@@ -439,318 +601,6 @@
 						"type": "String"
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/in_zz_order_unzip')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "test01_link_blob",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "21_B2D"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "zz_order.csv",
-						"folderPath": "21_B2D",
-						"container": "test01-private"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/in_zz_shop')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "test01_link_blob",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "21_B2D"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "zz_shop.zip",
-						"folderPath": "21_B2D",
-						"container": "test01-private"
-					},
-					"columnDelimiter": ",",
-					"compressionCodec": "ZipDeflate",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/in_zz_stock_work')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "test01_link_blob",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "zz_stock_work.zip",
-						"folderPath": "21_B2D",
-						"container": "test01-private"
-					},
-					"columnDelimiter": ",",
-					"compressionCodec": "ZipDeflate",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/sample_folder')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "test01_link_blob",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "31_BlobLote"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "31_BlobLote/sample",
-						"container": "test01-private"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/snk_company_mast')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "lnk_stock_sql",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "stock"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "bic_company_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "company_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "company_na",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sort_jun",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "company_mast"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/snk_contain_store_dept_mast')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "lnk_stock_sql",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "stock"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "retail_store_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "dept_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "category_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sub_category_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "link_pattern",
-						"type": "nvarchar"
-					},
-					{
-						"name": "containing_store_cd",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "contain_store_dept_mast"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/snk_dept_term')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "lnk_stock_sql",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "stock"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "company_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "dept_cd",
-						"type": "varchar"
-					},
-					{
-						"name": "judge_term",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "dept_term"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/snk_exclude_goods_info')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "lnk_stock_sql",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "stock"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "company_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "store_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "store_nm",
-						"type": "nvarchar"
-					},
-					{
-						"name": "jan_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "godds_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "remarks",
-						"type": "nvarchar"
-					},
-					{
-						"name": "dept_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "category_cd",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sub_category_cd",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "exclude_goods_info"
-				}
 			},
 			"dependsOn": []
 		}

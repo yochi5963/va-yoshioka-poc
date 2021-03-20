@@ -26,6 +26,18 @@
 		"trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode": {
 			"value": "1"
 		},
+		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
+			"value": "2"
+		},
+		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
+			"value": "GM"
+		},
+		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
+			"value": "odbms_arriv_gm_in"
+		},
+		"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
+			"value": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
+		},
 		"containerUri": {
 			"value": ""
 		},
