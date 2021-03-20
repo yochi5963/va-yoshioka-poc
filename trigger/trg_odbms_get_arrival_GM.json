@@ -1,0 +1,29 @@
+{
+	"name": "trg_odbms_get_arrival_GM",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pip_odbms_get_arrival",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"in_error_mode": "2",
+					"in_target": "GM",
+					"in_exec_na": "odbms_arriv_gm_in"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/stock/blobs/appdata/ftpdata/eai/odbms/in/order/11112233_GM_order.csv.gz",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
