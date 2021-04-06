@@ -2,21 +2,8 @@
 	"name": "trigger1",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
-		"pipelines": [
-			{
-				"pipelineReference": {
-					"referenceName": "CopyFilesfromMultipleContainers",
-					"type": "PipelineReference"
-				},
-				"parameters": {
-					"SourceFileFolder": "aaa",
-					"SourceFileDirectory": "bbbb",
-					"DestinationFileFolder": "ccc",
-					"DestinationFileDirectory": "dddd"
-				}
-			}
-		],
+		"runtimeState": "Stopped",
+		"pipelines": [],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
 			"blobPathBeginsWith": "/test01-private/blobs/hoge",
