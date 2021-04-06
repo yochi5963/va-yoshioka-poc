@@ -26,16 +26,19 @@
 		"trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode": {
 			"value": "1"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
-			"value": "2"
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder": {
+			"value": "aaa"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
-			"value": "GM"
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory": {
+			"value": "bbbb"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
-			"value": "odbms_arriv_gm_in"
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder": {
+			"value": "ccc"
 		},
-		"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory": {
+			"value": "dddd"
+		},
+		"trigger1_properties_typeProperties_scope": {
 			"value": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
 		}
 	}

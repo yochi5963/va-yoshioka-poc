@@ -13,6 +13,253 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pip_contain_store_dept_mast')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ImportCsv",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "00:05:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"compressionProperties": {
+										"type": "ZipDeflateReadSettings"
+									}
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "truncate table contain_store_dept_mast;",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 1
+										},
+										"sink": {
+											"name": "retail_store_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
+										},
+										"sink": {
+											"name": "dept_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 3
+										},
+										"sink": {
+											"name": "category_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 4
+										},
+										"sink": {
+											"name": "sub_category_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 5
+										},
+										"sink": {
+											"name": "link_pattern",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 6
+										},
+										"sink": {
+											"name": "containing_store_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "src_contain_store_dept_mast",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "snk_contain_store_dept_mast",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"concurrency": 1,
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pip_dept_term')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ImportCsv",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "00:05:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"compressionProperties": {
+										"type": "ZipDeflateReadSettings"
+									}
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "truncate table dept_term;",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 1
+										},
+										"sink": {
+											"name": "dept_cd",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
+										},
+										"sink": {
+											"name": "judge_term",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 3
+										},
+										"sink": {
+											"name": "company_cd",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "src_dept_term",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "snk_dept_term",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"concurrency": 1,
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pip_ecbeing_create_target_list_3')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -5762,394 +6009,6 @@
 				"lastPublishTime": "2021-01-06T01:40:39Z"
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/mfl_zz_order')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"folder": {
-					"name": "22_BmD"
-				},
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "in_zz_order_unzip",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "ot_zz_order",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "alter1"
-						}
-					],
-					"script": "source(output(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 alterRow(upsertIf(true())) ~> alter1\nalter1 sink(input(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['order_id'],\n\tformat: 'table',\n\tmapColumn(\n\t\torder_id = Column_1,\n\t\tshop_cd = Column_2\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/job_odbms_get_arrival')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "バッチ実行結果を参照し自JOBが当日正常終了していなければ処理続行",
-				"activities": [
-					{
-						"name": "GetJobStatusGM",
-						"description": "本日のバッチ実行結果を参照",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.00:01:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_gm_in_rslt_cd = '1'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dst_sql_none",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "CheckJobStatusGM",
-						"description": "本日のバッチ実行結果をチェック",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GetJobStatusGM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(\n  equals(\n    activity('GetJobStatusGM').output.firstRow.cnt,\n    1\n  )\n)",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "CancelPipelineGM",
-									"description": "処理終了",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "00:01:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
-										"storedProcedureParameters": {
-											"vc_exec_na": {
-												"value": "odbms_arriv_gm_in",
-												"type": "String"
-											},
-											"vc_log_text": {
-												"value": "実施済であるため、パイプライン処理を起動しません。",
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "lnk_stock_sql",
-										"type": "LinkedServiceReference"
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "NextPipelineGM",
-									"description": "後続処理呼出",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pip_odbms_get_arrival",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"in_error_mode": {
-												"value": "@pipeline().parameters.in_error_mode",
-												"type": "Expression"
-											},
-											"in_target": "GM",
-											"in_exec_na": "odbms_arriv_gm_in"
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "GetJobStatusGR",
-						"description": "本日のバッチ実行結果を参照",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "CheckJobStatusGM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:01:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_gr_in_rslt_cd = '1'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dst_sql_none",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "CheckJobStatusGR",
-						"description": "本日のバッチ実行結果をチェック",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GetJobStatusGR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(\n  equals(\n    activity('GetJobStatusGR').output.firstRow.cnt,\n    1\n  )\n)",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "CancelPipelineGR",
-									"description": "処理終了",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "00:01:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
-										"storedProcedureParameters": {
-											"vc_exec_na": {
-												"value": "odbms_arriv_gr_in",
-												"type": "String"
-											},
-											"vc_log_text": {
-												"value": "実施済であるため、パイプライン処理を起動しません。",
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "lnk_stock_sql",
-										"type": "LinkedServiceReference"
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "NextPipelineGR",
-									"description": "後続処理呼出",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pip_odbms_get_arrival",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"in_error_mode": {
-												"value": "@pipeline().parameters.in_error_mode",
-												"type": "Expression"
-											},
-											"in_target": "GR",
-											"in_exec_na": "odbms_arriv_gr_in"
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "GetJobStatusMD",
-						"description": "本日のバッチ実行結果を参照",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "CheckJobStatusGR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:01:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_md_in_rslt_cd = '1'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "dst_sql_none",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "CheckJobStatusMD",
-						"description": "本日のバッチ実行結果をチェック",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GetJobStatusMD",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(\n  equals(\n    activity('GetJobStatusMD').output.firstRow.cnt,\n    1\n  )\n)",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "CancelPipelineMD",
-									"description": "処理終了",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "00:01:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
-										"storedProcedureParameters": {
-											"vc_exec_na": {
-												"value": "odbms_arriv_md_in",
-												"type": "String"
-											},
-											"vc_log_text": {
-												"value": "実施済であるため、パイプライン処理を起動しません。",
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "lnk_stock_sql",
-										"type": "LinkedServiceReference"
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "NextPipelineMD",
-									"description": "後続処理呼出",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pip_odbms_get_arrival",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"in_error_mode": {
-												"value": "@pipeline().parameters.in_error_mode",
-												"type": "Expression"
-											},
-											"in_target": "MD",
-											"in_exec_na": "odbms_arriv_md_in"
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"concurrency": 1,
-				"parameters": {
-					"in_error_mode": {
-						"type": "string",
-						"defaultValue": "2"
-					}
-				},
-				"folder": {
-					"name": "stock"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pip_odbms_get_arrival')]"
-			]
 		}
 	]
 }

@@ -35,19 +35,23 @@
 			"type": "string",
 			"defaultValue": "1"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder": {
 			"type": "string",
-			"defaultValue": "2"
+			"defaultValue": "aaa"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory": {
 			"type": "string",
-			"defaultValue": "GM"
+			"defaultValue": "bbbb"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder": {
 			"type": "string",
-			"defaultValue": "odbms_arriv_gm_in"
+			"defaultValue": "ccc"
 		},
-		"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory": {
+			"type": "string",
+			"defaultValue": "dddd"
+		},
+		"trigger1_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
 		},
@@ -214,17 +218,20 @@
 					"trg_B2D_BlobTrigger_properties_typeProperties_scope": {
 						"value": "[parameters('trg_B2D_BlobTrigger_properties_typeProperties_scope')]"
 					},
-					"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
-						"value": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode')]"
+					"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder": {
+						"value": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder')]"
 					},
-					"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
-						"value": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target')]"
+					"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory": {
+						"value": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory')]"
 					},
-					"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
-						"value": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na')]"
+					"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder": {
+						"value": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder')]"
 					},
-					"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
-						"value": "[parameters('trg_odbms_get_arrival_GM_properties_typeProperties_scope')]"
+					"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory": {
+						"value": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory')]"
+					},
+					"trigger1_properties_typeProperties_scope": {
+						"value": "[parameters('trigger1_properties_typeProperties_scope')]"
 					},
 					"trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode": {
 						"value": "[parameters('trg_ecbeing_create_target_list_1_properties_pip_ecbeing_create_target_list_1_parameters_in_error_mode')]"

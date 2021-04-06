@@ -11,19 +11,23 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder": {
 			"type": "string",
-			"defaultValue": "2"
+			"defaultValue": "aaa"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory": {
 			"type": "string",
-			"defaultValue": "GM"
+			"defaultValue": "bbbb"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder": {
 			"type": "string",
-			"defaultValue": "odbms_arriv_gm_in"
+			"defaultValue": "ccc"
 		},
-		"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory": {
+			"type": "string",
+			"defaultValue": "dddd"
+		},
+		"trigger1_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
 		},
@@ -36,6 +40,547 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/mfl_zz_order')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "22_BmD"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "in_zz_order_unzip",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ot_zz_order",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "alter1"
+						}
+					],
+					"script": "source(output(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 alterRow(upsertIf(true())) ~> alter1\nalter1 sink(input(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['order_id'],\n\tformat: 'table',\n\tmapColumn(\n\t\torder_id = Column_1,\n\t\tshop_cd = Column_2\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyFilesfromMultipleContainers')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Scan the file path on your source storage store and get the container list.",
+				"activities": [
+					{
+						"name": "EnumerateContainersList",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "BinarySourceFileStore",
+								"type": "DatasetReference",
+								"parameters": {
+									"container": {
+										"value": "@pipeline().parameters.SourceFileFolder",
+										"type": "Expression"
+									},
+									"directory": {
+										"value": "@pipeline().parameters.SourceFileDirectory",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true
+							},
+							"formatSettings": {
+								"type": "BinaryReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEachContainer",
+						"description": "Get the container list from Metadata activity and then iterates each of them to Copy activity.",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "EnumerateContainersList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('EnumerateContainersList').output.childItems",
+								"type": "Expression"
+							},
+							"batchCount": 4,
+							"activities": [
+								{
+									"name": "CopyOneContainer",
+									"description": "Copy each container from source storage store to destination store.",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "BinarySourceFileStore",
+											"type": "DatasetReference",
+											"parameters": {
+												"container": {
+													"value": "@pipeline().parameters.SourceFileFolder",
+													"type": "Expression"
+												},
+												"directory": {
+													"value": "@concat(pipeline().parameters.SourceFileDirectory,'/',item().name)",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "BinarySinkFileStore",
+											"type": "DatasetReference",
+											"parameters": {
+												"container": {
+													"value": "@pipeline().parameters.DestinationFileFolder",
+													"type": "Expression"
+												},
+												"directory": {
+													"value": "@concat(pipeline().parameters.DestinationFileDirectory,'/',item().name)",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"SourceFileFolder": {
+						"type": "string",
+						"defaultValue": "/"
+					},
+					"SourceFileDirectory": {
+						"type": "string",
+						"defaultValue": "/"
+					},
+					"DestinationFileFolder": {
+						"type": "string",
+						"defaultValue": "/"
+					},
+					"DestinationFileDirectory": {
+						"type": "string",
+						"defaultValue": "/"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/job_odbms_get_arrival')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "バッチ実行結果を参照し自JOBが当日正常終了していなければ処理続行",
+				"activities": [
+					{
+						"name": "GetJobStatusGM",
+						"description": "本日のバッチ実行結果を参照",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:01:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_gm_in_rslt_cd = '1'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dst_sql_none",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "CheckJobStatusGM",
+						"description": "本日のバッチ実行結果をチェック",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetJobStatusGM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(\n  equals(\n    activity('GetJobStatusGM').output.firstRow.cnt,\n    1\n  )\n)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "CancelPipelineGM",
+									"description": "処理終了",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "00:01:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+										"storedProcedureParameters": {
+											"vc_exec_na": {
+												"value": "odbms_arriv_gm_in",
+												"type": "String"
+											},
+											"vc_log_text": {
+												"value": "実施済であるため、パイプライン処理を起動しません。",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "lnk_stock_sql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "NextPipelineGM",
+									"description": "後続処理呼出",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pip_odbms_get_arrival",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"in_error_mode": {
+												"value": "@pipeline().parameters.in_error_mode",
+												"type": "Expression"
+											},
+											"in_target": "GM",
+											"in_exec_na": "odbms_arriv_gm_in"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GetJobStatusGR",
+						"description": "本日のバッチ実行結果を参照",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "CheckJobStatusGM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:01:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_gr_in_rslt_cd = '1'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dst_sql_none",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "CheckJobStatusGR",
+						"description": "本日のバッチ実行結果をチェック",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetJobStatusGR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(\n  equals(\n    activity('GetJobStatusGR').output.firstRow.cnt,\n    1\n  )\n)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "CancelPipelineGR",
+									"description": "処理終了",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "00:01:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+										"storedProcedureParameters": {
+											"vc_exec_na": {
+												"value": "odbms_arriv_gr_in",
+												"type": "String"
+											},
+											"vc_log_text": {
+												"value": "実施済であるため、パイプライン処理を起動しません。",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "lnk_stock_sql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "NextPipelineGR",
+									"description": "後続処理呼出",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pip_odbms_get_arrival",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"in_error_mode": {
+												"value": "@pipeline().parameters.in_error_mode",
+												"type": "Expression"
+											},
+											"in_target": "GR",
+											"in_exec_na": "odbms_arriv_gr_in"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GetJobStatusMD",
+						"description": "本日のバッチ実行結果を参照",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "CheckJobStatusGR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:01:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT COUNT(*) AS cnt\n  FROM batch_exec_rslt_info beri\n WHERE exec_dt = dbo.get_current_exec_dt()\n   AND odbms_arriv_md_in_rslt_cd = '1'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dst_sql_none",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "CheckJobStatusMD",
+						"description": "本日のバッチ実行結果をチェック",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetJobStatusMD",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(\n  equals(\n    activity('GetJobStatusMD').output.firstRow.cnt,\n    1\n  )\n)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "CancelPipelineMD",
+									"description": "処理終了",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "00:01:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[insert_normal_exec_log]",
+										"storedProcedureParameters": {
+											"vc_exec_na": {
+												"value": "odbms_arriv_md_in",
+												"type": "String"
+											},
+											"vc_log_text": {
+												"value": "実施済であるため、パイプライン処理を起動しません。",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "lnk_stock_sql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "NextPipelineMD",
+									"description": "後続処理呼出",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pip_odbms_get_arrival",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"in_error_mode": {
+												"value": "@pipeline().parameters.in_error_mode",
+												"type": "Expression"
+											},
+											"in_target": "MD",
+											"in_exec_na": "odbms_arriv_md_in"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"concurrency": 1,
+				"parameters": {
+					"in_error_mode": {
+						"type": "string",
+						"defaultValue": "2"
+					}
+				},
+				"folder": {
+					"name": "stock"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/job_odbms_get_mininfo')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -845,7 +1390,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-01-18T07:45:28Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/mfl_zz_order')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pip_ecbeing_create_target_list_2')]",
@@ -1095,7 +1642,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/trg_odbms_get_arrival_GM')]",
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1104,27 +1651,30 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "pip_odbms_get_arrival",
+							"referenceName": "CopyFilesfromMultipleContainers",
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"in_error_mode": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode')]",
-							"in_target": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target')]",
-							"in_exec_na": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na')]"
+							"SourceFileFolder": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder')]",
+							"SourceFileDirectory": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory')]",
+							"DestinationFileFolder": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder')]",
+							"DestinationFileDirectory": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory')]"
 						}
 					}
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/stock/blobs/appdata/ftpdata/eai/odbms/in/order/11112233_GM_order.csv.gz",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('trg_odbms_get_arrival_GM_properties_typeProperties_scope')]",
+					"blobPathBeginsWith": "/test01-private/blobs/hoge",
+					"ignoreEmptyBlobs": false,
+					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
 					"events": [
 						"Microsoft.Storage.BlobCreated"
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CopyFilesfromMultipleContainers')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pip_ecbeing_create_target_list_1')]",

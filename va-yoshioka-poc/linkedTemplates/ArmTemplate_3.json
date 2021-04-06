@@ -502,210 +502,80 @@
 							"name": "AlterRowOrder"
 						}
 					],
-					"script": "parameters{\n\tshop_cd as string\n}\nsource(output(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Order\nsource(output(\n\t\todetail_id as long,\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tqty as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Odtail\nsource(output(\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tname as string,\n\t\tprice as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Goods\nJoinGoods aggregate(groupBy(order_id),\n\ttotal = sum(qty*price)) ~> SumOdtail\nOdtail, Goods join(Odtail@goods_cd == Goods@goods_cd,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinGoods\nOrder filter(shop_cd == $shop_cd) ~> FilterOrder\nFilterOrder, SumOdtail join(Order@order_id == SumOdtail@order_id,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinSumOdtail\nJoinSumOdtail alterRow(updateIf(true())) ~> AlterRowOrder\nAlterRowOrder sink(input(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['order_id'],\n\tformat: 'table',\n\tmapColumn(\n\t\torder_id = SumOdtail@order_id,\n\t\ttotal = SumOdtail@total\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> SinkOrder"
+					"script": "parameters{\n\tshop_cd as string\n}\nsource(output(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Order\nsource(output(\n\t\todetail_id as long,\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tqty as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Odtail\nsource(output(\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tname as string,\n\t\tprice as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Goods\nJoinGoods aggregate(groupBy(order_id),\n\ttotal = sum(qty*price)) ~> SumOdtail\nOdtail, Goods join(Odtail@goods_cd == Goods@goods_cd,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinGoods\nOrder filter(shop_cd == $shop_cd) ~> FilterOrder\nFilterOrder, SumOdtail join(Order@order_id == SumOdtail@order_id,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinSumOdtail\nJoinSumOdtail alterRow(updateIf(true())) ~> AlterRowOrder\nAlterRowOrder sink(input(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['order_id'],\n\tformat: 'table',\n\tmapColumn(\n\t\torder_id = SumOdtail@order_id,\n\t\ttotal = SumOdtail@total\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> SinkOrder"
 				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/01_TSQL_SelectCount')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/BinarySourceFileStore')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "select_count",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select * from zz_yoshioka22;",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "01_TSQL_None",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "01_TSQL_Out",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+				"description": "Connection to your source data store.",
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
+					},
+					"directory": {
+						"type": "string"
 					}
-				],
-				"folder": {
-					"name": "01_TSQL"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-01-27T04:43:16Z"
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().directory",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					}
+				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/01_TSQL_SelectError')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/BinarySinkFileStore')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "select",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select * from zz_yoshiokaHOGE",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "01_TSQL_None",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "01_TSQL_Out",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+				"description": "Connection to your destination data store.",
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
 					},
-					{
-						"name": "select_error",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "select",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select 'せれくとえらー発生'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "01_TSQL_None",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "01_TSQL_Out",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+					"directory": {
+						"type": "string"
 					}
-				],
-				"folder": {
-					"name": "01_TSQL"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-01-07T06:45:05Z"
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().directory",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					}
+				}
 			},
 			"dependsOn": []
 		}

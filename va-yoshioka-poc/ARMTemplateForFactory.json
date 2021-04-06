@@ -35,19 +35,23 @@
 			"type": "string",
 			"defaultValue": "1"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder": {
 			"type": "string",
-			"defaultValue": "2"
+			"defaultValue": "aaa"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory": {
 			"type": "string",
-			"defaultValue": "GM"
+			"defaultValue": "bbbb"
 		},
-		"trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder": {
 			"type": "string",
-			"defaultValue": "odbms_arriv_gm_in"
+			"defaultValue": "ccc"
 		},
-		"trg_odbms_get_arrival_GM_properties_typeProperties_scope": {
+		"trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory": {
+			"type": "string",
+			"defaultValue": "dddd"
+		},
+		"trigger1_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/924431d4-c274-4ce3-963e-06e1bb43eede/resourceGroups/V-YOSHIOKA-POC/providers/Microsoft.Storage/storageAccounts/vayoshiokablob"
 		}
@@ -12725,7 +12729,7 @@
 							"name": "AlterRowOrder"
 						}
 					],
-					"script": "parameters{\n\tshop_cd as string\n}\nsource(output(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Order\nsource(output(\n\t\todetail_id as long,\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tqty as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Odtail\nsource(output(\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tname as string,\n\t\tprice as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Goods\nJoinGoods aggregate(groupBy(order_id),\n\ttotal = sum(qty*price)) ~> SumOdtail\nOdtail, Goods join(Odtail@goods_cd == Goods@goods_cd,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinGoods\nOrder filter(shop_cd == $shop_cd) ~> FilterOrder\nFilterOrder, SumOdtail join(Order@order_id == SumOdtail@order_id,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinSumOdtail\nJoinSumOdtail alterRow(updateIf(true())) ~> AlterRowOrder\nAlterRowOrder sink(input(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['order_id'],\n\tformat: 'table',\n\tmapColumn(\n\t\torder_id = SumOdtail@order_id,\n\t\ttotal = SumOdtail@total\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> SinkOrder"
+					"script": "parameters{\n\tshop_cd as string\n}\nsource(output(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Order\nsource(output(\n\t\todetail_id as long,\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tqty as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Odtail\nsource(output(\n\t\tshop_cd as string,\n\t\tgoods_cd as string,\n\t\tname as string,\n\t\tprice as integer,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Goods\nJoinGoods aggregate(groupBy(order_id),\n\ttotal = sum(qty*price)) ~> SumOdtail\nOdtail, Goods join(Odtail@goods_cd == Goods@goods_cd,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinGoods\nOrder filter(shop_cd == $shop_cd) ~> FilterOrder\nFilterOrder, SumOdtail join(Order@order_id == SumOdtail@order_id,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinSumOdtail\nJoinSumOdtail alterRow(updateIf(true())) ~> AlterRowOrder\nAlterRowOrder sink(input(\n\t\torder_id as long,\n\t\tshop_cd as string,\n\t\ttotal as long,\n\t\trgdt as timestamp,\n\t\tupdt as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['order_id'],\n\tformat: 'table',\n\tmapColumn(\n\t\torder_id = SumOdtail@order_id,\n\t\ttotal = SumOdtail@total\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> SinkOrder"
 				}
 			},
 			"dependsOn": [
@@ -12735,7 +12739,241 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/trg_odbms_get_arrival_GM')]",
+			"name": "[concat(parameters('factoryName'), '/BinarySourceFileStore')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your source data store.",
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
+					},
+					"directory": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().directory",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/test01_link_blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BinarySinkFileStore')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your destination data store.",
+				"linkedServiceName": {
+					"referenceName": "test01_link_blob",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
+					},
+					"directory": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().directory",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/test01_link_blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyFilesfromMultipleContainers')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Scan the file path on your source storage store and get the container list.",
+				"activities": [
+					{
+						"name": "EnumerateContainersList",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "BinarySourceFileStore",
+								"type": "DatasetReference",
+								"parameters": {
+									"container": {
+										"value": "@pipeline().parameters.SourceFileFolder",
+										"type": "Expression"
+									},
+									"directory": {
+										"value": "@pipeline().parameters.SourceFileDirectory",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true
+							},
+							"formatSettings": {
+								"type": "BinaryReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEachContainer",
+						"description": "Get the container list from Metadata activity and then iterates each of them to Copy activity.",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "EnumerateContainersList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('EnumerateContainersList').output.childItems",
+								"type": "Expression"
+							},
+							"batchCount": 4,
+							"activities": [
+								{
+									"name": "CopyOneContainer",
+									"description": "Copy each container from source storage store to destination store.",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "BinarySourceFileStore",
+											"type": "DatasetReference",
+											"parameters": {
+												"container": {
+													"value": "@pipeline().parameters.SourceFileFolder",
+													"type": "Expression"
+												},
+												"directory": {
+													"value": "@concat(pipeline().parameters.SourceFileDirectory,'/',item().name)",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "BinarySinkFileStore",
+											"type": "DatasetReference",
+											"parameters": {
+												"container": {
+													"value": "@pipeline().parameters.DestinationFileFolder",
+													"type": "Expression"
+												},
+												"directory": {
+													"value": "@concat(pipeline().parameters.DestinationFileDirectory,'/',item().name)",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"SourceFileFolder": {
+						"type": "string",
+						"defaultValue": "/"
+					},
+					"SourceFileDirectory": {
+						"type": "string",
+						"defaultValue": "/"
+					},
+					"DestinationFileFolder": {
+						"type": "string",
+						"defaultValue": "/"
+					},
+					"DestinationFileDirectory": {
+						"type": "string",
+						"defaultValue": "/"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/BinarySourceFileStore')]",
+				"[concat(variables('factoryId'), '/datasets/BinarySinkFileStore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -12744,28 +12982,29 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "pip_odbms_get_arrival",
+							"referenceName": "CopyFilesfromMultipleContainers",
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"in_error_mode": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_error_mode')]",
-							"in_target": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_target')]",
-							"in_exec_na": "[parameters('trg_odbms_get_arrival_GM_properties_pip_odbms_get_arrival_parameters_in_exec_na')]"
+							"SourceFileFolder": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileFolder')]",
+							"SourceFileDirectory": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_SourceFileDirectory')]",
+							"DestinationFileFolder": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileFolder')]",
+							"DestinationFileDirectory": "[parameters('trigger1_properties_CopyFilesfromMultipleContainers_parameters_DestinationFileDirectory')]"
 						}
 					}
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/stock/blobs/appdata/ftpdata/eai/odbms/in/order/11112233_GM_order.csv.gz",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('trg_odbms_get_arrival_GM_properties_typeProperties_scope')]",
+					"blobPathBeginsWith": "/test01-private/blobs/hoge",
+					"ignoreEmptyBlobs": false,
+					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
 					"events": [
 						"Microsoft.Storage.BlobCreated"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pip_odbms_get_arrival')]"
+				"[concat(variables('factoryId'), '/pipelines/CopyFilesfromMultipleContainers')]"
 			]
 		}
 	]
